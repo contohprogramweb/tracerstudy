@@ -1,37 +1,36 @@
 ```
-# CodeIgniter specific ignores
-application/logs/
-application/cache/
-application/temp/
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
+*.log
+*.tmp
+*.swp
 
 # Dependencies
 vendor/
+*.phar
 
 # Environment
 .env
 .env.local
 .env.*
 
+# Editors
+.vscode/
+.idea/
+
 # Logs
 *.log
 
-# Editor/IDE
-.vscode/
-.idea/
+# Backup and swap files
+*~
+*.bak
 *.swp
 *.swo
-*.tmp
 
-# OS
+# OS generated files
 .DS_Store
 Thumbs.db
-
-# Build/compiled files
-*.o
-*.obj
-*.exe
-*.dll
-*.so
-*.a
-*.out
 ```
