@@ -1,32 +1,76 @@
 ```
 # CodeIgniter specific ignores
-application/logs/*
-application/cache/*
-application/config/config.php
+application/logs/
+application/cache/
 application/config/database.php
+system/
+composer.lock
 
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
-*.log
-*.tmp
-
-# Dependencies
-vendor/
+# PHP related
+*.php~
+*.phtml~
+*.php.bak
+*.php.swp
 
 # Environment
 .env
 .env.local
 .env.*
 
-# Editors
+# Logs
+*.log
+application/logs/*
+
+# Cache and temporary files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.PythonCache/
+.php_cs.cache
+.phpunit.result.cache
+
+# Dependencies
+vendor/
+node_modules/
+bower_components/
+
+# IDE and editor files
 .vscode/
 .idea/
 *.swp
+*.swo
+*~
 
-# OS
+# OS generated files
 .DS_Store
 Thumbs.db
+ehthumbs.db
+Icon?
+.directory
+*.nfs*
+
+# Build and distribution
+dist/
+build/
+target/
+coverage/
+htmlcov/
+.coverage
+
+# Database
+*.sql
+*.dump
+*.dmp
+
+# Compression archives
+*.zip
+*.tar
+*.gz
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
 ```
