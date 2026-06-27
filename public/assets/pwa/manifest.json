@@ -10,13 +10,13 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/public/assets/templates/icon-192.png",
+      "src": "/assets/pwa/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/public/assets/templates/icon-512.png",
+      "src": "/assets/pwa/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -31,14 +31,14 @@
       "short_name": "Survey",
       "description": "Mulai mengisi survey tracer study",
       "url": "/survey_builder/survey",
-      "icons": [{ "src": "/public/assets/templates/icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/assets/pwa/icons/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Install App",
       "short_name": "Install",
       "description": "Install aplikasi PWA",
       "url": "/pwa/install",
-      "icons": [{ "src": "/public/assets/templates/icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/assets/pwa/icons/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
