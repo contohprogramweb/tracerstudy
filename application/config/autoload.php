@@ -10,7 +10,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | when the application starts.
 |
 */
-$autoload['config'] = array();
+$autoload['config'] = array('encryption');
 
 /*
 |--------------------------------------------------------------------------
@@ -21,7 +21,7 @@ $autoload['config'] = array();
 | Libraries are loaded automatically by default.
 |
 */
-$autoload['libraries'] = array('database', 'session', 'form_validation');
+$autoload['libraries'] = array('database', 'session', 'form_validation', 'encryption', 'tracer_encryption');
 
 /*
 |--------------------------------------------------------------------------
@@ -31,7 +31,7 @@ $autoload['libraries'] = array('database', 'session', 'form_validation');
 | Helper files contain functions that assist in common tasks.
 |
 */
-$autoload['helper'] = array('url', 'file', 'security', 'form', 'text', 'date');
+$autoload['helper'] = array('url', 'file', 'security', 'form', 'text', 'date', 'tracer_validation');
 
 /*
 |--------------------------------------------------------------------------
