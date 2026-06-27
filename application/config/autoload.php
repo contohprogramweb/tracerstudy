@@ -21,7 +21,7 @@ $autoload['config'] = array('encryption');
 | Libraries are loaded automatically by default.
 |
 */
-$autoload['libraries'] = array('database', 'session', 'form_validation', 'encryption', 'tracer_encryption');
+$autoload['libraries'] = array('database', 'session', 'form_validation', 'encryption', 'tracer_encryption', 'auth_lib');
 
 /*
 |--------------------------------------------------------------------------

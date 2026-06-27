@@ -1,37 +1,37 @@
 ```
-# Compiled and build artifacts
-*.pyc
-__pycache__/
+# CodeIgniter specific ignores
+application/logs/
+application/cache/
+application/temp/
 
 # Dependencies
 vendor/
-node_modules/
-
-# Logs and temp files
-*.log
-*.tmp
 
 # Environment
 .env
 .env.local
-*.env.*
+.env.*
 
-# Editors
+# Logs
+*.log
+
+# Editor/IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+*.tmp
 
-# OS generated files
+# OS
 .DS_Store
 Thumbs.db
 
-# Backup files
-*~
-*.bak
-*.swp
-
-# Distribution / packaging
-dist/
-build/
-*.egg
-*.egg-info/
+# Build/compiled files
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
 ```
