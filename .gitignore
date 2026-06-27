@@ -2,30 +2,93 @@
 # Compiled and build artifacts
 *.pyc
 __pycache__/
+*.o
+*.obj
+dist/
+build/
+target/
 
 # Dependencies
-vendor/
 node_modules/
-
-# Logs and temp files
-*.log
-*.tmp
-
-# Environment
+vendor/
+*.egg-info/
+.venv/
+venv/
 .env
 .env.local
 *.env.*
 
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.swo
+
 # Editors
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # OS generated files
 .DS_Store
 Thumbs.db
 
-# CodeIgniter specific
-application/logs/
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# Python specific
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+.eggs/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git/
+.mypy_cache/
+.pytest_cache/
+.hypothesis/
+
+# PHP specific
+*.php~
+*.php.bak
+*.php.swp
+*.php.swo
+composer.lock
+vendor/
+
+# Build directories
 application/cache/
+application/logs/
 system/
+assets/dist/
+assets/build/
+
+# Database
+*.sql
+*.db
+*.sqlite
+
+# Compression archives
+*.zip
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.gz
+*.rar
+*.7z
 ```
