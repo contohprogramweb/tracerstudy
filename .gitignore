@@ -1,1 +1,25 @@
-(application/modules/stakeholder/views/dashboard.php, application/modules/stakeholder/views/gap_analysis.php, application/modules/stakeholder/views/list_by_alumni.php, application/modules/stakeholder/views/list_by_prodi.php, application/modules/stakeholder/views/register.php, application/modules/stakeholder/views/survey.php)
+```
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+
+# Dependencies
+vendor/
+node_modules/
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# Database
+*.sql
+```
