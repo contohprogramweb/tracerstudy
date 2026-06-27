@@ -5,14 +5,14 @@
  */
 
 const CACHE_NAME = 'survey-cache-v1';
-const OFFLINE_URL = '/public/offline.php';
+const OFFLINE_URL = '/assets/pwa/offline.html';
 
 // Resources to precache
 const PRECACHE_ASSETS = [
   '/',
-  '/public/manifest.json',
-  '/public/offline.php',
-  '/public/pwa.js',
+  '/assets/pwa/manifest.json',
+  '/assets/pwa/offline.html',
+  '/assets/pwa/pwa.js',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://code.jquery.com/jquery-3.6.0.min.js',

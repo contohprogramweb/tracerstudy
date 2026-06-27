@@ -156,7 +156,8 @@ class Pwa extends CI_Controller {
             ->set_content_type('application/json')
             ->set_output(json_encode([
                 'scope' => '/',
-                'sw_path' => '/public/sw.js'
+                'sw_path' => '/assets/pwa/sw.js',
+                'manifest_path' => '/assets/pwa/manifest.json'
             ]));
     }
 }
