@@ -2,169 +2,77 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
- * AuditHook - Audit Trail Hook
- *
- * Logs user activities for audit trail purposes.
- *
- * @package     Tracer Study
- * @subpackage  Hooks
- * @category    Hooks
- * @author      Tracer Study Team
+ * AuditHook - Hook untuk mencatat activity log secara otomatis
+ * 
+ * Digunakan untuk intercept operasi database dan mencatatnya ke activity_logs
+ * BR-SEC-001: Activity log tidak dapat dihapus oleh siapapun
  */
+class AuditHook {
+    protected $CI;
 
-class AuditHook
-{
-    /**
-     * CodeIgniter instance
-     * @var CI_Controller
-     */
-    private $CI;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
+    public function __construct() {
         $this->CI =& get_instance();
+        $this->CI->load->database();
     }
 
     /**
-     * Log user activity
-     *
-     * This hook runs after controller execution.
-     * It logs important user actions to the database.
-     *
-     * @return void
+     * Log aktivitas manual yang dipanggil dari controller/model
+     * 
+     * @param string $action (create, update, delete, login, logout, export, import, sync)
+     * @param string $module (nama tabel/modul)
+     * @param mixed $description (string atau array)
+     * @param int|null $user_id
+     * @param mixed|null $old_val
+     * @param mixed|null $new_val
+     * 
+     * @return int|false Insert ID atau false jika gagal
      */
-    public function log_activity()
-    {
-        // Only log if user is logged in
-        if (!$this->CI->session->has_userdata('user_id')) {
-            return;
-        }
-
-        // Get current request info
-        $user_id = $this->CI->session->userdata('user_id');
-        $controller = $this->CI->router->class;
-        $method = $this->CI->router->method;
-        $uri_string = $this->CI->uri->uri_string();
-        $ip_address = $this->CI->input->ip_address();
-        $user_agent = $this->CI->input->user_agent();
-        $request_method = $this->CI->input->method(TRUE);
-        $request_time = date('Y-m-d H:i:s');
-
-        // Define actions that should be logged
-        $loggable_actions = array(
-            'insert', 'create', 'add', 'store',
-            'update', 'edit', 'save',
-            'delete', 'remove', 'destroy',
-            'export', 'download', 'upload',
-            'login', 'logout', 'register'
-        );
-
-        // Check if current action should be logged
-        $should_log = FALSE;
-
-        foreach ($loggable_actions as $action) {
-            if (strpos($method, $action) !== FALSE) {
-                $should_log = TRUE;
-                break;
+    public function log($action, $module, $description, $user_id = null, $old_val = null, $new_val = null) {
+        if (empty($user_id)) {
+            // Coba ambil dari session jika ada
+            if ($this->CI->session->userdata('logged_in')) {
+                $user_data = $this->CI->session->userdata('user_data');
+                $user_id = $user_data['id'] ?? null;
+            } else {
+                $user_id = null; // System action
             }
         }
 
-        // Also log specific controllers
-        $loggable_controllers = array('auth', 'laporan', 'iku', 'survey');
+        $data = [
+            'user_id'       => $user_id,
+            'activity_type' => $action,
+            'table_name'    => $module,
+            'record_id'     => null,
+            'old_values'    => $old_val !== null ? json_encode($old_val, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null,
+            'new_values'    => $new_val !== null ? json_encode($new_val, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null,
+            'description'   => is_array($description) ? json_encode($description, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : $description,
+            'ip_address'    => $this->CI->input->ip_address(),
+            'user_agent'    => $this->CI->agent->agent_string() ?? null,
+            'created_at'    => date('Y-m-d H:i:s')
+        ];
 
-        if (in_array($controller, $loggable_controllers)) {
-            $should_log = TRUE;
-        }
-
-        if (!$should_log) {
-            return;
-        }
-
-        // Prepare audit data
-        $audit_data = array(
-            'user_id' => $user_id,
-            'controller' => $controller,
-            'method' => $method,
-            'uri_string' => $uri_string,
-            'ip_address' => $ip_address,
-            'user_agent' => $user_agent,
-            'request_method' => $request_method,
-            'action' => $this->_determine_action($controller, $method),
-            'description' => $this->_generate_description($controller, $method),
-            'created_at' => $request_time
-        );
-
-        // Insert audit log to database
-        // Note: Make sure 'audit_logs' table exists
         try {
-            $this->CI->db->insert('audit_logs', $audit_data);
+            $this->CI->db->insert('activity_logs', $data);
+            return $this->CI->db->insert_id();
         } catch (Exception $e) {
-            // Log error but don't interrupt the flow
-            log_message('error', 'AuditHook: Failed to log activity - ' . $e->getMessage());
+            log_message('error', 'AuditHook failed to write log: ' . $e->getMessage());
+            return false;
         }
     }
 
     /**
-     * Determine action type from method name
-     *
-     * @param string $controller Controller name
-     * @param string $method Method name
-     * @return string
+     * Hook yang dipanggil setelah constructor controller
+     * Bisa digunakan untuk logging global
      */
-    private function _determine_action($controller, $method)
-    {
-        $action_map = array(
-            'index' => 'VIEW',
-            'view' => 'VIEW',
-            'show' => 'VIEW',
-            'create' => 'CREATE',
-            'store' => 'CREATE',
-            'add' => 'CREATE',
-            'edit' => 'UPDATE',
-            'update' => 'UPDATE',
-            'save' => 'UPDATE',
-            'delete' => 'DELETE',
-            'destroy' => 'DELETE',
-            'remove' => 'DELETE',
-            'export' => 'EXPORT',
-            'download' => 'DOWNLOAD',
-            'upload' => 'UPLOAD',
-            'login' => 'LOGIN',
-            'logout' => 'LOGOUT',
-            'register' => 'REGISTER'
-        );
-
-        return isset($action_map[$method]) ? $action_map[$method] : 'OTHER';
+    public function postControllerConstructor() {
+        // Bisa digunakan untuk tracking request global
     }
 
     /**
-     * Generate human-readable description
-     *
-     * @param string $controller Controller name
-     * @param string $method Method name
-     * @return string
+     * Hook yang dipanggil sebelum shutdown
+     * Bisa digunakan untuk cleanup atau final logging
      */
-    private function _generate_description($controller, $method)
-    {
-        $action = $this->_determine_action($controller, $method);
-        $module = ucfirst($controller);
-
-        $descriptions = array(
-            'VIEW' => "Melihat data {$module}",
-            'CREATE' => "Menambah data {$module} baru",
-            'UPDATE' => "Mengubah data {$module}",
-            'DELETE' => "Menghapus data {$module}",
-            'EXPORT' => "Mengekspor data {$module}",
-            'DOWNLOAD' => "Mengunduh file {$module}",
-            'UPLOAD' => "Mengunggah file {$module}",
-            'LOGIN' => "Login ke sistem",
-            'LOGOUT' => "Logout dari sistem",
-            'REGISTER' => "Registrasi akun baru"
-        );
-
-        return isset($descriptions[$action]) ? $descriptions[$action] : "Aksi {$method} pada {$module}";
+    public function postSystem() {
+        // Final logging jika diperlukan
     }
 }

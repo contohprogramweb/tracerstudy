@@ -31,7 +31,7 @@ $autoload['libraries'] = array('database', 'session', 'form_validation', 'encryp
 | Helper files contain functions that assist in common tasks.
 |
 */
-$autoload['helper'] = array('url', 'file', 'security', 'form', 'text', 'date', 'tracer_validation');
+$autoload['helper'] = array('url', 'file', 'security', 'form', 'text', 'date', 'tracer_validation', 'tracer_audit');
 
 /*
 |--------------------------------------------------------------------------
