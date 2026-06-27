@@ -1,68 +1,37 @@
 ```
-# CodeIgniter specific ignores
-application/cache/*
-!application/cache/.gitkeep
-application/logs/*
-!application/logs/.gitkeep
+# Compiled and build artifacts
+*.pyc
+__pycache__/
 
-# Environment and config files
+# Dependencies
+vendor/
+node_modules/
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Environment
 .env
 .env.local
-.env.*
+*.env.*
 
-# Logs
-*.log
-
-# Temporary files
-*.tmp
-*.swp
+# Editors
+.vscode/
+.idea/
 
 # OS generated files
 .DS_Store
 Thumbs.db
 
-# Editor/IDE files
-.vscode/
-.idea/
+# Backup files
+*~
+*.bak
+*.swp
 
-# Dependencies (if any are present)
-node_modules/
-vendor/
-
-# Build artifacts (if any)
-build/
+# Distribution / packaging
 dist/
-target/
-
-# Python specific (if Python files are part of the project)
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-venv/
-.venv/
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.log
-.git/modules/
-.DS_Store
-.hg
-.hgignore
-.hgcheck
-.hgsigs
-.hgtags
-.svn
-.svnignore
-.wafpickle-N
-*.so
-.libs
-.deps
+build/
+*.egg
+*.egg-info/
 ```
