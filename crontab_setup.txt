@@ -1,0 +1,66 @@
+# CodeIgniter 3 Cron Jobs Setup Guide
+# =====================================
+
+# Add these lines to your crontab (run 'crontab -e' to edit)
+# Or configure in cPanel under "Cron Jobs"
+
+# Environment setup (adjust PHP path as needed)
+PHP_PATH="/usr/bin/php"
+SITE_PATH="/home/user/public_html"
+
+# IKU Calculation - Daily at 02:00 WIB
+0 2 * * * $PHP_PATH $SITE_PATH/index.php cli/cron/iku_calculate >> /dev/null 2>&1
+
+# Reminder Notifications - Daily at 08:00 WIB
+0 8 * * * $PHP_PATH $SITE_PATH/index.php cli/cron/reminder >> /dev/null 2>&1
+
+# PDDikti Sync - Daily at 01:00 WIB
+0 1 * * * $PHP_PATH $SITE_PATH/index.php cli/cron/pddikti_sync >> /dev/null 2>&1
+
+# Export Processor - Every 5 minutes
+*/5 * * * * $PHP_PATH $SITE_PATH/index.php cli/cron/export_processor >> /dev/null 2>&1
+
+# Notification Queue Processor - Every 5 minutes
+*/5 * * * * $PHP_PATH $SITE_PATH/index.php cli/cron/notification_queue >> /dev/null 2>&1
+
+# API Key Rotation - Monthly on 1st at 00:00
+0 0 1 * * $PHP_PATH $SITE_PATH/index.php cli/cron/api_key_rotate >> /dev/null 2>&1
+
+# Log Archive - Monthly on 1st at 00:00
+0 0 1 * * $PHP_PATH $SITE_PATH/index.php cli/cron/log_archive >> /dev/null 2>&1
+
+
+# Manual Testing Commands:
+# ========================
+# php index.php cli/cron/iku_calculate
+# php index.php cli/cron/iku_calculate 5        # Specific kohort_id
+# php index.php cli/cron/iku_calculate null 3   # Specific prodi_id
+# php index.php cli/cron/reminder
+# php index.php cli/cron/pddikti_sync 2024
+# php index.php cli/cron/export_processor
+# php index.php cli/cron/api_key_rotate
+# php index.php cli/cron/log_archive
+# php index.php cli/cron/notification_queue
+
+
+# Monitoring Commands:
+# ====================
+# View cron logs:
+tail -f /var/log/cron
+
+# Check last cron runs:
+grep CRON /var/log/syslog | tail -20
+
+# Test CLI access:
+php index.php cli/cron/iku_calculate --help
+
+
+# Notes:
+# ======
+# 1. Adjust PHP_PATH and SITE_PATH according to your server configuration
+# 2. Ensure PHP CLI is installed: php -v
+# 3. Make sure application/logs directory is writable
+# 4. Configure admin_email in config.php for error notifications
+# 5. For cPanel, use the full path to PHP (usually /usr/local/bin/php)
+# 6. Redirect output to log file for debugging:
+#    */5 * * * * php /path/to/index.php cli/cron/export_processor >> /home/user/cron_export.log 2>&1
