@@ -1,85 +1,68 @@
 ```
-# Dependencies
-vendor/
-node_modules/
+# CodeIgniter specific ignores
+application/cache/*
+!application/cache/.gitkeep
+application/logs/*
+!application/logs/.gitkeep
 
-# Compiled/Build artifacts
-*.o
-*.obj
-*.exe
-*.dll
-*.so
-*.a
-*.out
-build/
-dist/
-target/
-
-# Python specific
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.py.class
-.Python
-env/
-venv/
-.venv/
-.ENV
+# Environment and config files
 .env
 .env.local
 .env.*
-.mypy_cache/
-.pytest_cache/
-.coverage
-coverage/
-htmlcov/
 
-# Logs and temp files
+# Logs
 *.log
+
+# Temporary files
 *.tmp
 *.swp
-*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
 
 # Editor/IDE files
 .vscode/
 .idea/
-*.swp
-*.swo
 
-# System files
+# Dependencies (if any are present)
+node_modules/
+vendor/
+
+# Build artifacts (if any)
+build/
+dist/
+target/
+
+# Python specific (if Python files are part of the project)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git/modules/
 .DS_Store
-Thumbs.db
-
-# Compressed files
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
-
-# CodeIgniter specific
-application/cache/
-application/logs/
-application/sessions/
-application/temp/
-system/
-!system/index.html
+.hg
+.hgignore
+.hgcheck
+.hgsigs
+.hgtags
+.svn
+.svnignore
+.wafpickle-N
+*.so
+.libs
+.deps
 ```
