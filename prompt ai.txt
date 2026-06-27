@@ -1,0 +1,925 @@
+Berikut adalah step-by-step perintah/prompt AI untuk membangun aplikasi Tracer Study sesuai SRS v3.1 (CodeIgniter 3). Setiap prompt dirancang spesifik, berurutan, dan bisa langsung digunakan ke AI coding assistant.
+FASE 1: FOUNDATION & SETUP (Sprint 0-1)
+Prompt 1: Project Structure & CI3 Setup
+plain
+
+Buatkan struktur project CodeIgniter 3 lengkap untuk "Sistem Tracer Study Perguruan Tinggi v3.1" dengan HMVC (Modular Extensions).
+
+Requirements:
+- PHP 7.4+ compatible
+- HMVC structure dengan folder modules: alumni, survey, iku, auth, kurikulum, laporan, stakeholder
+- Setup config.php: base_url dinamis, encryption_key random, session_driver = 'database'
+- Setup database.php dengan konfigurasi MySQL
+- Setup autoload: database, session, form_validation, url, file, security
+- Setup routes untuk HMVC
+- Setup hooks: AuthHook, AuditHook, MaintenanceHook
+- Folder uploads dengan subfolder: avatars, exports, bukti
+- .htaccess untuk rewrite dan security headers
+- composer.json dengan dependency: phpoffice/phpspreadsheet, dompdf/dompdf, phpunit/phpunit
+
+Jangan buat CRUD dulu, fokus pada struktur folder, konfigurasi, dan base classes (MY_Controller, MY_Model).
+
+Prompt 2: Database Schema & Migration
+plain
+
+Buatkan file SQL lengkap untuk database Tracer Study sesuai SRS v3.1 dengan 20+ tabel:
+
+Tabel WAJIB:
+1. users (autentikasi multi-role)
+2. program_studi
+3. fakultas
+4. kohorts (manajemen kohort)
+5. alumni (data alumni lengkap dengan enkripsi PII)
+6. surveys (survey builder)
+7. survey_sections
+8. survey_questions (dengan is_belma_inti flag)
+9. survey_logic (logic jump, dengan cycle detection)
+10. survey_responses
+11. survey_answers
+12. stakeholders (pengguna lulusan)
+13. stakeholder_surveys
+14. kurikulum
+15. cpl (capaian pembelajaran)
+16. iku_calculations (perhitungan IKU-1)
+17. verifikasi_data
+18. activity_logs (immutable, NO DELETE)
+19. notifications
+20. ump_provinsi
+21. api_keys
+22. jobs (database queue)
+23. failed_jobs
+24. login_attempts (rate limiting)
+25. cache (CI3 file cache metadata)
+
+Constraint:
+- FOREIGN KEY lengkap
+- INDEX strategis untuk performance
+- CHECK constraints (question_id != target_question_id)
+- UNIQUE constraints (survey_id+alumni_id, tahun_iku+prodi_id+kohort_id)
+- ENUM untuk status/state machine
+- JSON columns untuk options, mapping, payload
+
+Sertakan juga data seed untuk: program_studi, fakultas, ump_provinsi (2024-2026), dan 1 super admin.
+
+Prompt 3: Base Model & Encryption Library
+plain
+
+Buatkan base model dan library enkripsi untuk CI3:
+
+1. MY_Model.php (extends CI_Model):
+   - CRUD dasar: find(), findAll(), insert(), update(), delete()
+   - Soft delete support
+   - Query builder wrapper
+   - Pagination helper
+   - Where clause builder
+   - Order by builder
+   - Timestamp auto-management (created_at, updated_at)
+
+2. Encryption library wrapper:
+   - encryptPII($data) - AES-256 untuk: no_hp, alamat, gaji_aktual, NIK
+   - decryptPII($data)
+   - maskPII($data, $type) - untuk display di log (***)
+   - hashForLog($data) - SHA-256 untuk audit trail
+
+3. Validation helper:
+   - validateNIM($nim)
+   - validateEmailUnik($email, $exclude_id=null)
+   - validateTanggalYudisium($tanggal)
+   - validateMasaTunggu($tanggal_mulai, $tanggal_yudisium)
+
+Gunakan CI3 native encryption library dengan config di encryption.php.
+
+FASE 2: AUTENTIKASI & KEAMANAN (Sprint 1)
+Prompt 4: Auth System Multi-Role
+plain
+
+Buatkan sistem autentikasi multi-role untuk CI3 dengan requirements:
+
+Controller: Auth.php
+- login() - dengan rate limiting (cek tabel login_attempts, max 5 per IP per menit, lock 30 menit)
+- logout() - destroy session
+- forgotPassword() - kirim email reset
+- resetPassword() - validasi token
+- verifyEmail() - verifikasi OTP email
+
+Model: User_model.php
+- createUser($data)
+- updateUser($id, $data)
+- getUserByEmail($email)
+- getUserById($id)
+- verifyEmail($user_id)
+
+Library: Auth_lib.php
+- checkRole($allowed_roles) - middleware otorisasi
+- checkPermission($module, $action) - granular permission
+- getCurrentUser()
+- isLoggedIn()
+- hasProdiAccess($prodi_id)
+
+Roles: super_admin, admin_pusat_karir, admin_prodi, dosen, alumni, stakeholder, reviewer
+
+Business Rules:
+- BR-SEC-004: Session timeout 30 menit idle, extend saat isi survey (heartbeat)
+- BR-SEC-005: Rate limit login 5 attempt per IP per menit
+- BR-ALM-005: Alumni belum verifikasi email boleh isi survey tapi tidak masuk IKU
+- Password hashing: password_hash() PHP native (bcrypt)
+- Activity log: setiap login, logout, failed attempt di-log ke activity_logs
+
+Sertakan view: login.php, forgot_password.php, reset_password.php dengan Bootstrap 5.
+
+Prompt 5: RBAC & Audit Trail
+plain
+
+Buatkan sistem RBAC (Role-Based Access Control) dan Audit Trail immutable:
+
+1. RBAC Library (Auth_lib.php methods):
+   - checkSurveyView($user, $survey)
+   - checkSurveyCreate($user)
+   - checkSurveyDelete($user, $survey) - cek is_belma_inti, reject jika ada
+   - checkSurveyPublish($user, $survey) - cek min 20 pertanyaan inti
+   - checkAlumniEdit($user, $alumni)
+   - checkIkuExport($user) - hanya admin_pusat_karir atau super_admin
+   - checkProdiAccess($user, $prodi_id)
+
+2. Audit Trail (AuditHook.php):
+   - Log setiap: create, update, delete, login, logout, export, import, sync
+   - Data: user_id, action, module, description (JSON), ip_address, user_agent, created_at
+   - BR-SEC-001: Activity log tidak dapat dihapus oleh siapapun
+   - Method: logActivity($action, $module, $description, $user_id=null)
+
+3. Audit Trail Controller (Audit.php):
+   - index() - list log dengan filter (module, action, date range, user)
+   - view($id) - detail log
+   - export() - export log ke Excel/PDF
+   - NO delete() method
+
+4. View: audit/index.php dengan:
+   - DataTables server-side processing
+   - Filter dropdown: module, action, user
+   - Date range picker
+   - Export buttons (Excel, PDF)
+
+Sertakan juga helper function: audit_log() yang bisa dipanggil dari controller mana saja.
+
+FASE 3: MANAJEMEN ALUMNI & KOHORT (Sprint 2)
+Prompt 6: Alumni Management CRUD
+plain
+
+Buatkan modul Alumni Management lengkap:
+
+Controller: Alumni.php
+- index() - list alumni dengan filter (kohort, prodi, status_kerja, gaji, search) + pagination
+- create() - form registrasi alumni
+- store() - simpan alumni dengan validasi
+- edit($id) - form edit
+- update($id) - update dengan trigger recalculation IKU
+- delete($id) - soft delete
+- import() - upload Excel/CSV dengan PHPSpreadsheet
+- export() - export ke Excel
+- syncPddikti() - trigger sync dari PDDikti NeoFeeder
+
+Model: Alumni_model.php (extends MY_Model)
+- getAlumniWithFilter($filters, $page, $per_page)
+- importBatch($data_array) - insert batch dengan skip duplicate NIM
+- getByNIM($nim)
+- getByKohort($kohort_id)
+- updateStatusKerja($id, $status)
+- calculateMasaTunggu($tanggal_mulai, $tanggal_yudisium)
+- getStatsByKohort($kohort_id)
+
+Business Rules:
+- BR-ALM-001: Hanya bisa isi survey kohort aktif
+- BR-ALM-002: NIM immutable setelah create
+- BR-ALM-003: Alumni belum_bekerja tidak boleh isi gaji/perusahaan/jabatan
+- BR-ALM-004: Masa tunggu auto-calculate, reject jika negatif
+- BR-ALM-005: Alumni belum verifikasi email boleh isi survey tapi tidak masuk IKU
+- BR-ALM-006: Import Excel wajib kolom NIM, Nama, Prodi, Tahun Lulus
+- BR-ALM-007: Alumni tidak boleh isi survey kohort yang sama 2x
+- BR-ALM-008: Update profil memicu recalculation IKU
+- BR-ALM-009: Data PDDikti precedence lebih tinggi dari manual
+- BR-ALM-010: Alumni nonaktif dikecualikan dari target populasi
+
+View:
+- alumni/index.php - tabel dengan DataTables, filter sidebar
+- alumni/create.php - form registrasi
+- alumni/edit.php - form edit dengan conditional fields
+- alumni/import.php - upload Excel dengan preview
+- alumni/detail.php - detail alumni lengkap
+
+Sertakan template Excel untuk import di folder assets/templates/template_import_alumni.xlsx
+
+Prompt 7: Kohort Management
+plain
+
+Buatkan modul Kohort Management:
+
+Controller: Kohort.php
+- index() - list kohort dengan progress bar
+- create() - generate kohort otomatis
+- store() - simpan kohort
+- edit($id)
+- update($id)
+- delete($id) - hanya jika belum ada responden
+- activate($id) - aktifkan survey untuk kohort
+- close($id) - tutup survey
+- getProgress($id) - AJAX progress per prodi
+
+Model: Kohort_model.php
+- getActiveKohorts()
+- getKohortByTahunProdi($tahun, $prodi_id)
+- generateKohortFromAlumni($tahun_lulus)
+- calculateMinResponden($target_populasi) - threshold:
+  * 1-100: 80%
+  * 101-500: 60%
+  * 501-1000: 35%
+  * 1001-2000: 20%
+  * 2001-3000: 15%
+  * >3000: 10%
+- updateResponseRate($kohort_id)
+- getAlertKohorts() - kohort yang belum memenuhi minimum
+
+Business Rules:
+- BR-ALM-001: Kohort aktif = lulusan 1-2 tahun sebelum tahun berjalan
+- BR-ALM-007: Auto-assign alumni ke kohort berdasarkan tahun_lulus
+
+View:
+- kohort/index.php - tabel kohort dengan progress bar dan status badge
+- kohort/create.php - form generate kohort
+- kohort/detail.php - detail kohort dengan grafik progress per prodi
+- kohort/_progress.php - partial view untuk AJAX progress
+
+Sertakan juga widget dashboard untuk menampilkan kohort aktif dan alert.
+
+Prompt 8: PDDikti Sync Integration
+plain
+
+Buatkan integrasi sinkronisasi data alumni dari PDDikti NeoFeeder:
+
+Library: PddiktiSync.php
+- connect($config) - koneksi ke PDDikti API
+- fetchMahasiswaLulus($tahun_lulus, $prodi_id=null) - ambil data mahasiswa lulus
+- mapToAlumniFormat($pddikti_data) - mapping field PDDikti ke format alumni
+- mergeData($pddikti_data, $existing_data) - strategi merge: PDDikti wins
+- validateData($data) - validasi NIM unik, format email, tahun lulus
+- syncBatch($tahun_lulus, $prodi_id) - proses sync batch
+- logSyncResult($result) - log hasil sync
+
+Controller: Sync.php (CLI + Web)
+- pddikti($tahun_lulus, $prodi_id) - trigger sync via web
+- cliPddikti() - trigger sync via CLI (cron job)
+- status($job_id) - cek status sync job
+
+Model: Sync_job_model.php
+- createJob($type, $payload)
+- updateJob($id, $status, $result)
+- getPendingJobs()
+- processJob($id)
+
+Business Rules:
+- BR-ALM-009: Data PDDikti precedence lebih tinggi dari manual
+- BR-ALM-010: Alumni nonaktif dikecualikan
+- BR-SEC-003: API Key rotasi otomatis 90 hari
+
+Error Handling:
+- ERR-ALM-002: PDDikti API timeout → queue retry 3x
+- ERR-ALM-003: Format tidak valid → reject dengan template download
+
+Cron Setup:
+- php index.php sync cliPddikti (daily 01:00 WIB)
+
+Sertakan konfigurasi PDDikti di config/pddikti.php
+
+FASE 4: SURVEY BUILDER & EXECUTION (Sprint 3-4)
+Prompt 9: Survey Builder dengan Logic Jump
+plain
+
+Buatkan Survey Builder lengkap dengan Logic Jump/Conditional Branching:
+
+Controller: Survey_builder.php
+- index() - list survey
+- create() - form buat survey
+- store() - simpan survey
+- edit($id) - edit survey (hanya draft)
+- update($id)
+- delete($id)
+- publish($id) - publish dengan validasi min 20 pertanyaan inti
+- duplicate($id) - duplikat ke draft baru
+- preview($id) - preview survey
+
+Controller: Survey_question.php
+- index($survey_id) - list pertanyaan
+- create($survey_id) - form tambah pertanyaan
+- store($survey_id) - simpan pertanyaan
+- edit($survey_id, $question_id)
+- update($survey_id, $question_id)
+- delete($survey_id, $question_id) - cek is_belma_inti
+- reorder() - AJAX reorder pertanyaan
+
+Controller: Survey_logic.php
+- create($survey_id) - form logic jump
+- store($survey_id) - simpan logic dengan cycle detection
+- delete($survey_id, $logic_id)
+- validateCycle($survey_id, $question_id, $target_id) - DFS cycle detection
+
+Model: Survey_model.php, Survey_question_model.php, Survey_logic_model.php
+
+Tipe Pertanyaan:
+- short_answer
+- multiple_choice
+- long_answer
+- dropdown
+- checkbox
+- rating (1-5)
+- date
+- number
+
+Business Rules:
+- BR-SUR-001: Pertanyaan inti tidak dapat dihapus/diubah oleh Admin Prodi
+- BR-SUR-002: Min 20 pertanyaan inti untuk publish
+- BR-SUR-003: Logic jump tidak boleh circular reference
+- BR-SUR-004: Survey published tidak boleh diubah struktur
+
+View:
+- survey_builder/index.php - list survey dengan status badge
+- survey_builder/create.php - form buat survey
+- survey_builder/edit.php - edit survey
+- survey_builder/questions.php - drag-drop question builder
+- survey_builder/logic.php - visual logic jump builder
+- survey_builder/preview.php - preview survey
+
+Gunakan jQuery untuk drag-drop reorder dan visual logic builder.
+Sertakan 20 pertanyaan inti Belmawa sebagai default saat create survey.
+
+Prompt 10: Survey Form Alumni (Mobile + Offline)
+plain
+
+Buatkan survey form untuk alumni dengan mobile-friendly dan offline support:
+
+Controller: Survey.php
+- form($survey_id) - tampilkan survey form
+- submit($survey_id) - submit jawaban
+- autosave($survey_id) - AJAX auto-save
+- resume($survey_id) - lanjutkan survey yang belum selesai
+- status($survey_id) - cek status pengisian
+
+Library: Survey_form.php
+- getQuestionsWithLogic($survey_id, $alumni_id) - ambil pertanyaan dengan logic applied
+- processLogicJump($survey_id, $answers) - tentukan pertanyaan selanjutnya
+- validateAnswers($survey_id, $answers) - validasi required dan format
+- saveProgress($survey_id, $alumni_id, $answers) - simpan progress
+- submitFinal($survey_id, $alumni_id, $answers) - submit final
+- generateSertifikat($response_id) - generate PDF sertifikat
+
+Business Rules:
+- BR-ALM-001: Hanya kohort aktif yang bisa isi
+- BR-ALM-007: Tidak boleh isi 2x untuk kohort yang sama
+- BR-SUR-005: Auto-save ke localStorage, bisa dilanjutkan 7 hari
+- BR-SUR-008: Prioritas bekerja > wirausaha > studi > belum untuk IKU
+
+Offline Support (jQuery + localStorage):
+- Saat offline: simpan jawaban ke localStorage
+- Saat online: sync ke server via AJAX
+- Progress bar dengan persentase
+- Auto-save setiap 30 detik
+- Notifikasi "Auto-save aktif" / "Data tersimpan lokal"
+
+View:
+- survey/form.php - mobile-first survey form
+  * Progress bar
+  * Pertanyaan per halaman (pagination)
+  * Logic jump real-time (jQuery)
+  * Auto-save indicator
+  * Offline indicator
+  * Tombol Kembali/Lanjut/Submit
+
+Sertakan juga Service Worker sederhana untuk PWA (workbox via CDN).
+
+Prompt 11: Survey Stakeholder (Pengguna Lulusan)
+plain
+
+Buatkan modul Survey Stakeholder/Pengguna Lulusan:
+
+Controller: Stakeholder.php
+- register() - registrasi DUDI/Employer
+- dashboard() - dashboard stakeholder
+- survey($alumni_id) - isi survey untuk alumni tertentu
+- submit($alumni_id) - submit penilaian
+- gapAnalysis($prodi_id) - view gap analysis CPL
+
+Controller: Stakeholder_survey.php
+- create($alumni_id) - form survey stakeholder
+- store($alumni_id) - simpan survey
+- listByAlumni($alumni_id) - list survey stakeholder per alumni
+- listByProdi($prodi_id) - list survey stakeholder per prodi
+
+Model: Stakeholder_model.php, Stakeholder_survey_model.php
+
+Business Rules:
+- BR-SUR-006: Stakeholder survey wajib linked ke alumni atau prodi
+- BR-SUR-007: Rating kompetensi di-average 60:40 (stakeholder:alumni)
+
+Penilaian:
+- Rating kompetensi 1-5 per CPL
+- Kesesuaian CPL (sangat_sesuai, sesuai, kurang, tidak_sesuai)
+- Rekomendasi kompetensi yang dibutuhkan industri
+- Saran perbaikan kurikulum
+
+View:
+- stakeholder/register.php - form registrasi DUDI
+- stakeholder/dashboard.php - dashboard stakeholder
+- stakeholder/survey.php - form penilaian kompetensi
+- stakeholder/gap_analysis.php - grafik gap analysis
+
+Sertakan email invitation ke stakeholder dengan link survey.
+
+FASE 5: IKU-1 & PELAPORAN NASIONAL (Sprint 5)
+Prompt 12: IKU-1 Calculator Engine
+plain
+
+Buatkan engine perhitungan IKU-1 lengkap:
+
+Library: IkuCalculator.php
+- calculate($kohort_id, $prodi_id) - perhitungan utama IKU-1
+- calculateBobot($alumni) - hitung bobot per alumni:
+  * Bekerja:
+    - Gaji ≥ 1.2 UMP + Masa tunggu ≤ 6 bulan = 1.0
+    - Gaji ≥ 1.2 UMP + Masa tunggu 7-12 bulan = 0.8
+    - Gaji < 1.2 UMP + Masa tunggu ≤ 6 bulan = 0.8
+    - Gaji < 1.2 UMP + Masa tunggu 7-12 bulan = 0.6
+  * Wirausaha: 1.0 (omzet ≥ UMP) / 0.8 (omzet < UMP)
+  * Lanjut Studi: 0.6
+  * Belum Bekerja: 0
+- checkMinimumResponse($kohort_id) - cek response rate vs threshold
+- applyVVPenalty($score, $vv_rate) - kurangi 20% jika V&V < 80%
+- getUMPByProvinsi($provinsi, $tahun) - lookup UMP
+- reconcileData($alumni_id) - rekonsiliasi jika bekerja + studi (prioritas bekerja)
+
+Formula:
+IKU-1 = (Σ Bobot Responden / Total Responden Memenuhi Minimum) × 100
+
+Controller: Iku.php (CLI + Web)
+- calculate($kohort_id, $prodi_id) - trigger perhitungan
+- dashboard() - view dashboard IKU
+- detail($id) - detail perhitungan IKU
+- verify($alumni_id) - verifikasi data alumni
+- exportBelmawa($kohort_id, $prodi_id) - export template Belmawa
+- triwulan($tahun, $quarter) - laporan triwulan
+
+Cron Job:
+- php index.php iku calculateAll (daily 02:00 WIB)
+
+Business Rules:
+- BR-IKU-001: IKU hanya valid jika response rate ≥ minimum
+- BR-IKU-002: Sumber kebenaran gaji_aktual > gaji_range
+- BR-IKU-003: V&V rate < 80% = pengurangan skor 20%
+- BR-IKU-004: Auto-calc daily 02:00 WIB + real-time saat update
+- BR-IKU-005: Export Belmawa hanya admin_pusat_karir/super_admin
+- BR-IKU-006: Data sudah dikirim immutable
+- BR-IKU-007: UMP provinsi domisili alumni
+- BR-SUR-008: Prioritas bekerja > wirausaha > studi > belum
+
+View:
+- iku/dashboard.php - gauge chart, progress kohort, tabel detail
+- iku/detail.php - detail perhitungan per alumni
+- iku/verifikasi.php - list alumni pending verifikasi
+- iku/export.php - form export Belmawa
+
+Prompt 13: Export Template Belmawa
+plain
+
+Buatkan export template Excel sesuai format tracerstudy.kemdikbud.go.id:
+
+Library: BelmawaTemplate.php
+- generate($kohort_id, $prodi_id) - generate file Excel
+- formatData($alumni_data) - format data sesuai template Belmawa
+- validateFormat($file) - validasi format upload
+- importFeedback($file) - import feedback dari Belmawa
+
+Format Kolom:
+- A: NIM
+- B: Nama
+- C: Program Studi
+- D: Tahun Lulus
+- E: Status (1=Bekerja, 2=Wirausaha, 3=Lanjut Studi, 4=Belum Bekerja)
+- F: Masa Tunggu (bulan)
+- G: Gaji (kode range)
+- H-X: Jawaban pertanyaan inti (kode sesuai panduan Belmawa)
+
+Controller: Export.php
+- belmawa($kohort_id, $prodi_id) - export template
+- download($filename) - download file
+- status($job_id) - cek status export
+
+Background Processing:
+- Export diproses via cron job (tabel jobs)
+- Notifikasi email saat selesai
+- File disimpan di uploads/exports/
+
+Business Rules:
+- BR-IKU-005: Export hanya oleh Admin Pusat Karir/Super Admin
+- BR-IKU-006: Data sudah dikirim tidak boleh diubah
+
+Error Handling:
+- ERR-IKU-002: Response rate < minimum → dicegah
+- ERR-IKU-003: Data sudah dikirim → dicegah
+
+Gunakan PhpSpreadsheet untuk generate Excel.
+
+FASE 6: LAPORAN, KURIKULUM & NOTIFIKASI (Sprint 5-6)
+Prompt 14: Laporan & Dashboard Analitik
+plain
+
+Buatkan modul Laporan dan Dashboard Analitik:
+
+Controller: Laporan.php
+- dashboard() - dashboard utama dengan grafik
+- statusKerja() - laporan status kerja
+- gaji() - laporan distribusi gaji
+- masaTunggu() - laporan masa tunggu
+- kompetensi() - laporan evaluasi kompetensi
+- kurikulum() - laporan evaluasi kurikulum
+- iku() - laporan IKU-1
+- banpt() - laporan evaluasi diri BAN-PT Kriteria 9
+- ppepp() - laporan PPEPP
+- exportPdf($type) - export ke PDF (DOMPDF)
+- exportExcel($type) - export ke Excel
+
+Grafik (Chart.js via jQuery):
+- Pie Chart: Distribusi status kerja
+- Bar Chart: Rata-rata gaji per prodi/tahun
+- Line Chart: Tren jumlah responden per kohort
+- Doughnut Chart: Persentase kesesuaian kompetensi
+- Radar Chart: Profil kompetensi lulusan vs industri
+- Stacked Bar: Perbandingan multi-periode
+- Gauge Chart: Real-time IKU-1 score vs target
+- Heatmap: Gap analysis CPL (D3.js)
+
+Filter:
+- Periode/Kohort
+- Program Studi
+- Angkatan
+- Status Kerja
+- Range Gaji
+
+View:
+- laporan/dashboard.php - dashboard dengan grafik interaktif
+- laporan/status_kerja.php - detail status kerja
+- laporan/gaji.php - detail gaji
+- laporan/kompetensi.php - detail kompetensi
+- laporan/kurikulum.php - heatmap gap analysis
+- laporan/iku.php - detail IKU
+- laporan/banpt.php - format BAN-PT
+- laporan/ppepp.php - format PPEPP
+
+Sertakan print-friendly CSS dan export buttons.
+
+Prompt 15: Kurikulum & CPL Management
+plain
+
+Buatkan modul Manajemen Kurikulum dan CPL:
+
+Controller: Kurikulum.php
+- index() - list kurikulum per prodi
+- create() - form tambah mata kuliah
+- store() - simpan
+- edit($id)
+- update($id)
+- delete($id)
+- compare($tahun1, $tahun2) - perbandingan kurikulum antar periode
+
+Controller: Cpl.php
+- index($prodi_id) - list CPL per prodi
+- create($prodi_id)
+- store($prodi_id)
+- edit($prodi_id, $id)
+- update($prodi_id, $id)
+- delete($prodi_id, $id)
+- mapSnDikti($id) - pemetaan ke SN-Dikti
+- mapKkni($id) - pemetaan ke KKNI
+
+Controller: Gap_analysis.php
+- index($prodi_id) - gap analysis CPL vs industri
+- calculate($prodi_id) - hitung gap dari survey alumni + stakeholder
+- rekomendasi($prodi_id) - generate rekomendasi perbaikan
+
+Model: Kurikulum_model.php, Cpl_model.php
+
+Business Rules:
+- KUR-003: Penilaian kesesuaian CPL 60:40 (stakeholder:alumni)
+- KUR-006: Pemetaan CPL ke SN-Dikti dan KKNI
+- KUR-007: Evaluasi CPL berbasis tracer study
+
+View:
+- kurikulum/index.php - tabel kurikulum
+- kurikulum/create.php - form mata kuliah
+- kurikulum/compare.php - perbandingan antar periode
+- cpl/index.php - list CPL
+- cpl/mapping.php - pemetaan SN-Dikti/KKNI
+- gap_analysis/index.php - heatmap gap analysis
+- gap_analysis/rekomendasi.php - rekomendasi perbaikan
+
+Prompt 16: Notifikasi & Reminder System
+plain
+
+Buatkan sistem notifikasi dan reminder:
+
+Library: Notification.php
+- sendEmail($to, $subject, $message, $attachment=null)
+- sendWhatsApp($to, $message) - integrasi WhatsApp API
+- sendTelegram($to, $message) - integrasi Telegram Bot
+- queueNotification($user_id, $type, $judul, $pesan) - queue ke tabel jobs
+- processQueue() - proses queue notifikasi
+
+Controller: Notification.php
+- index() - list notifikasi
+- settings() - pengaturan notifikasi
+- test() - test kirim notifikasi
+
+Cron Job:
+- php index.php notification processQueue (setiap 5 menit)
+- php index.php notification sendReminders (daily 08:00 WIB)
+
+Reminder Rules:
+- BR-NOT-001: H-7, H-3, H-1 sebelum tgl_selesai survey
+- BR-NOT-002: WhatsApp fallback ke Email jika gagal (3 retry)
+- BR-NOT-003: Scope notifikasi by role (Admin Prodi hanya prodi sendiri)
+
+Template Email:
+- reminder_survey.php - reminder mengisi survey
+- welcome_alumni.php - selamat datang
+- verifikasi_data.php - permintaan verifikasi data
+- export_selesai.php - notifikasi export selesai
+- iku_alert.php - alert IKU tidak tercapai
+
+View:
+- notification/index.php - list notifikasi dengan status
+- notification/settings.php - pengaturan channel notifikasi
+
+FASE 7: PWA, OPTIMASI & DEPLOYMENT (Sprint 6)
+Prompt 17: PWA & Offline Support
+plain
+
+Buatkan Progressive Web App (PWA) dengan offline support:
+
+Files:
+- manifest.json - PWA manifest
+- sw.js - Service Worker (Workbox CDN)
+- pwa.js - jQuery wrapper untuk PWA functionality
+
+Features:
+- Installable (Add to Home Screen)
+- Offline survey form (localStorage)
+- Background sync saat online
+- Push notification (optional, via OneSignal atau custom)
+
+Service Worker:
+- Cache static assets (CSS, JS, images)
+- Cache survey questions
+- Background sync untuk survey responses
+- Fallback offline page
+
+localStorage Schema (jQuery):
+- ts_survey_{survey_id}_progress: { answers, timestamp, last_question }
+- ts_survey_{survey_id}_status: 'in_progress' | 'completed'
+- ts_user_token: API token
+- ts_offline_queue: array of pending requests
+
+Sync Logic:
+- Saat online: cek localStorage, sync ke server via AJAX
+- Jika sync gagal: tetap di localStorage, retry next time
+- Setelah sync sukses: clear localStorage, show success message
+
+View:
+- offline.php - halaman fallback saat offline
+- pwa/install.php - instruksi install PWA
+
+Prompt 18: Cron Jobs & Background Processing
+plain
+
+Buatkan sistem cron jobs dan background processing untuk CI3:
+
+CLI Controllers (application/controllers/cli/):
+- Cron.php - dispatcher cron jobs
+  * iku_calculate($kohort_id=null, $prodi_id=null)
+  * reminder()
+  * pddikti_sync($tahun_lulus=null, $prodi_id=null)
+  * export_processor()
+  * api_key_rotate()
+  * log_archive()
+  * notification_queue()
+
+Library: JobQueue.php
+- push($queue, $payload) - tambah job ke tabel jobs
+- pop($queue) - ambil job dari queue
+- process($job_id) - proses job
+- fail($job_id, $exception) - mark job as failed
+- retry($job_id) - retry failed job (max 3 attempts)
+
+Database Queue (tabel jobs):
+- id, queue, payload (JSON), attempts, reserved_at, available_at, created_at
+
+Cron Setup (cPanel):
+```bash
+# IKU Calculation - Daily 02:00 WIB
+0 2 * * * /usr/bin/php /home/user/public_html/index.php cli/cron iku_calculate
+
+# Reminder - Daily 08:00 WIB
+0 8 * * * /usr/bin/php /home/user/public_html/index.php cli/cron reminder
+
+# PDDikti Sync - Daily 01:00 WIB
+0 1 * * * /usr/bin/php /home/user/public_html/index.php cli/cron pddikti_sync
+
+# Export Processor - Every 5 minutes
+*/5 * * * * /usr/bin/php /home/user/public_html/index.php cli/cron export_processor
+
+# Notification Queue - Every 5 minutes
+*/5 * * * * /usr/bin/php /home/user/public_html/index.php cli/cron notification_queue
+
+# API Key Rotation - Monthly
+0 0 1 * * /usr/bin/php /home/user/public_html/index.php cli/cron api_key_rotate
+
+# Log Archive - Monthly
+0 0 1 * * /usr/bin/php /home/user/public_html/index.php cli/cron log_archive
+
+Error Handling:
+
+    Log error ke file + email alert
+    Retry failed jobs 3x
+    Dead letter queue (failed_jobs table)
+
+plain
+
+
+### Prompt 19: Deployment & Shared Hosting Setup
+
+Buatkan deployment guide dan setup untuk shared hosting:
+Files:
+
+    DEPLOYMENT.md - panduan deployment lengkap
+    install.php - installer script (cek requirements, setup database, create admin)
+    .htaccess - rewrite rules dan security headers
+    php.ini - konfigurasi PHP (upload_max_filesize, post_max_size, max_execution_time)
+
+Deployment Checklist:
+
+    Upload file via FTP/Git ke public_html
+    Konfigurasi database.php dengan credential hosting
+    Set folder permissions:
+        uploads/ (755)
+        application/cache/ (755)
+        application/logs/ (755)
+    Import database.sql via phpMyAdmin
+    Run install.php untuk setup awal
+    Setup cron jobs via cPanel
+    Konfigurasi email SMTP
+    Aktifkan SSL (Let's Encrypt via cPanel)
+    Test semua fitur
+
+Security:
+
+    .htaccess: deny access ke folder system, application
+    .htaccess: disable directory listing
+    .htaccess: security headers (X-Frame-Options, X-XSS-Protection, etc.)
+    Move system folder outside web root (jika memungkinkan)
+    Protect install.php dengan password atau hapus setelah install
+
+Optimasi Shared Hosting:
+
+    CI3 caching aktif
+    Query result caching
+    File-based session (atau database jika shared hosting mendukung)
+    Minify CSS/JS
+    Gzip compression via .htaccess
+    Browser caching via .htaccess
+
+Monitoring:
+
+    CI3 Log Library untuk error tracking
+    Email alert untuk error critical
+    UptimeRobot untuk uptime monitoring (external)
+
+plain
+
+
+---
+
+## FASE 8: TESTING & DOCUMENTATION
+
+### Prompt 20: Unit Testing & Test Cases
+
+Buatkan unit testing untuk modul-modul utama menggunakan PHPUnit:
+Test Files:
+
+    tests/models/User_model_test.php
+    tests/models/Alumni_model_test.php
+    tests/models/Survey_model_test.php
+    tests/models/Iku_calculation_model_test.php
+    tests/libraries/Auth_lib_test.php
+    tests/libraries/IkuCalculator_test.php
+    tests/libraries/SurveyLogic_test.php
+    tests/libraries/Encryption_test.php
+    tests/controllers/Auth_test.php
+    tests/controllers/Alumni_test.php
+    tests/controllers/Survey_test.php
+
+Test Cases (sesuai SRS):
+
+    TC-SUR-001: Admin membuat survey baru
+    TC-SUR-002: Logic jump "Sudah Bekerja"
+    TC-SUR-004: Hapus pertanyaan inti (harus gagal)
+    TC-SUR-005: Publish survey dengan pertanyaan inti < 20 (harus gagal)
+    TC-ALM-001: Import 1000 data Excel
+    TC-ALM-003: Masa tunggu negatif (harus gagal)
+    TC-IKU-001: Hitung IKU-1
+    TC-IKU-002: Response rate < minimum
+    TC-AUTH-001: Login gagal 5x (harus lock)
+    TC-SEC-001: Hapus activity log (harus gagal)
+    TC-PWA-001: Offline survey (localStorage)
+
+Setup:
+
+    phpunit.xml configuration
+    Test database (SQLite atau MySQL test)
+    Fixture/seeder untuk test data
+    Mock untuk external API (PDDikti, WhatsApp)
+
+Coverage Target: ≥ 80%
+plain
+
+
+### Prompt 21: API Documentation & User Manual
+
+Buatkan dokumentasi lengkap:
+
+    API Documentation (Postman Collection / Markdown):
+        Semua endpoint dari Lampiran D
+        Request/Response examples
+        Authentication (API Key)
+        Error codes
+    User Manual (PDF):
+        Manual Admin Pusat Karir
+        Manual Admin Prodi
+        Manual Alumni
+        Manual Stakeholder
+        Manual Super Admin
+    Technical Documentation:
+        Arsitektur sistem
+        Database schema
+        API specification
+        Deployment guide
+        Troubleshooting
+    Video Tutorial (script):
+        Cara registrasi alumni
+        Cara mengisi survey
+        Cara membuat survey
+        Cara menghitung IKU-1
+        Cara export template Belmawa
+        Cara verifikasi data
+
+plain
+
+
+---
+
+## URUTAN EKSEKUSI REKOMENDASI
+
+| Urutan | Prompt | Durasi Estimasi |
+|--------|--------|-----------------|
+| 1 | Prompt 1: Project Structure | 1 hari |
+| 2 | Prompt 2: Database Schema | 1 hari |
+| 3 | Prompt 3: Base Model & Encryption | 1 hari |
+| 4 | Prompt 4: Auth System | 2 hari |
+| 5 | Prompt 5: RBAC & Audit Trail | 2 hari |
+| 6 | Prompt 6: Alumni Management | 3 hari |
+| 7 | Prompt 7: Kohort Management | 2 hari |
+| 8 | Prompt 8: PDDikti Sync | 2 hari |
+| 9 | Prompt 9: Survey Builder | 4 hari |
+| 10 | Prompt 10: Survey Form | 3 hari |
+| 11 | Prompt 11: Stakeholder Survey | 2 hari |
+| 12 | Prompt 12: IKU-1 Calculator | 3 hari |
+| 13 | Prompt 13: Export Belmawa | 2 hari |
+| 14 | Prompt 14: Laporan & Dashboard | 3 hari |
+| 15 | Prompt 15: Kurikulum & CPL | 2 hari |
+| 16 | Prompt 16: Notifikasi | 2 hari |
+| 17 | Prompt 17: PWA | 2 hari |
+| 18 | Prompt 18: Cron Jobs | 1 hari |
+| 19 | Prompt 19: Deployment | 1 hari |
+| 20 | Prompt 20: Testing | 3 hari |
+| 21 | Prompt 21: Documentation | 2 hari |
+
+**Total Estimasi: 12 minggu (6 sprint x 2 minggu)**
+
+---
+
+## TIPS PENGGUNAAN PROMPT
+
+1. **Satu Prompt Satu Modul** - Jangan campur modul dalam satu prompt
+2. **Spesifikkan Business Rules** - Selalu sebutkan BR-ID yang relevan
+3. **Sertakan Error Handling** - Sebutkan ERR-XXX yang harus diimplementasikan
+4. **Tanyakan Test Cases** - Minta AI buatkan unit test untuk setiap modul
+5. **Review & Iterasi** - Setelah output, review dan minta perbaikan spesifik
+6. **Dokumentasikan Perubahan** - Catat setiap perubahan dari SRS jika ada
+
+Dokumen ini juga tersimpan untuk referensi:
+
+**[Step-by-Step Prompt AI - Tracer Study CI3](sandbox:///mnt/agents/output/Step_by_Step_Prompt_AI_Tracer_Study_CI3.md)**
