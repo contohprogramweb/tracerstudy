@@ -1,94 +1,57 @@
 ```
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
-dist/
-build/
-target/
+# CodeIgniter specific ignores
+application/logs/
+application/cache/
+application/config/autoload.php
+application/config/database.php
+system/
 
 # Dependencies
-node_modules/
 vendor/
-*.egg-info/
-.venv/
-venv/
+
+# Environment
 .env
 .env.local
-*.env.*
+.env.*
 
-# Logs and temp files
+# Logs
 *.log
-*.tmp
-*.swp
-*.swo
+application/logs/*
 
-# Editors
+# Temporary files
+*.tmp
+*.temp
+Thumbs.db
+.DS_Store
+
+# Editor/IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# OS generated files
-.DS_Store
-Thumbs.db
+# Build/compiled files
+*.pyc
+__pycache__/
+*.o
+*.obj
+*.out
+*.exe
+*.dll
+*.so
+*.a
 
-# Coverage reports
+# Coverage
 coverage/
 htmlcov/
 .coverage
 
-# Python specific
-*.pyc
-__pycache__/
-*.pyo
-*.pyd
-.Python
-*.so
-*.egg
-*.egg-info/
-.eggs/
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.cache/
-nosetests.xml
-coverage.xml
-*.cover
-*.log
-.git/
-.mypy_cache/
-.pytest_cache/
-.hypothesis/
+# Package managers
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# PHP specific
-*.php~
-*.php.bak
-*.php.swp
-*.php.swo
-composer.lock
-vendor/
-
-# Build directories
-application/cache/
-application/logs/
-system/
-assets/dist/
-assets/build/
-
-# Database
-*.sql
-*.db
-*.sqlite
-
-# Compression archives
-*.zip
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.gz
-*.rar
-*.7z
+# Testing
+.phpunit.result.cache
 ```
