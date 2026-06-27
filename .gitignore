@@ -2,35 +2,30 @@
 # Compiled and build artifacts
 *.pyc
 __pycache__/
-*.o
-*.obj
-*.log
-*.tmp
-*.swp
 
 # Dependencies
 vendor/
-*.phar
+node_modules/
+
+# Logs and temp files
+*.log
+*.tmp
 
 # Environment
 .env
 .env.local
-.env.*
+*.env.*
 
 # Editors
 .vscode/
 .idea/
 
-# Logs
-*.log
-
-# Backup and swap files
-*~
-*.bak
-*.swp
-*.swo
-
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# CodeIgniter specific
+application/logs/
+application/cache/
+system/
 ```
