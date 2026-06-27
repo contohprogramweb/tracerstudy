@@ -1,76 +1,36 @@
 ```
-# CodeIgniter specific ignores
-application/logs/
-application/cache/
-application/config/database.php
-system/
-composer.lock
+# Logs and temp files
+*.log
+*.tmp
 
-# PHP related
-*.php~
-*.phtml~
-*.php.bak
-*.php.swp
-
-# Environment
+# Environment files
 .env
 .env.local
-.env.*
+*.env.*
 
-# Logs
-*.log
-application/logs/*
-
-# Cache and temporary files
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.PythonCache/
-.php_cs.cache
-.phpunit.result.cache
-
-# Dependencies
-vendor/
-node_modules/
-bower_components/
-
-# IDE and editor files
+# Editor/IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
-# OS generated files
-.DS_Store
-Thumbs.db
-ehthumbs.db
-Icon?
-.directory
-*.nfs*
-
-# Build and distribution
-dist/
-build/
-target/
-coverage/
-htmlcov/
-.coverage
-
-# Database
-*.sql
-*.dump
-*.dmp
-
-# Compression archives
+# Compressed files
 *.zip
-*.tar
 *.gz
+*.tar
 *.tgz
 *.bz2
 *.xz
 *.7z
 *.rar
 *.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
 ```
