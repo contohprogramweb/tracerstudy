@@ -1,25 +1,32 @@
 ```
+# CodeIgniter specific ignores
+application/logs/*
+application/cache/*
+application/config/config.php
+application/config/database.php
+
 # Compiled and build artifacts
 *.pyc
 __pycache__/
+*.o
+*.obj
+*.log
+*.tmp
 
 # Dependencies
 vendor/
-node_modules/
-
-# Logs and temp files
-*.log
-*.tmp
 
 # Environment
 .env
 .env.local
-*.env.*
+.env.*
 
 # Editors
 .vscode/
 .idea/
+*.swp
 
-# Database
-*.sql
+# OS
+.DS_Store
+Thumbs.db
 ```
