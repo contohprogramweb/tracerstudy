@@ -1,72 +1,58 @@
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
-*.class
-*.exe
-*.dll
-*.so
-*.a
-*.out
+```
+# CodeIgniter specific
+application/logs/
+application/cache/
+application/config/config.php
+application/config/database.php
+system/
+user_guide/
 
 # Dependencies
-node_modules/
-venv/
-.venv/
+application/vendor/
+composer.lock
+
+# Environment
 .env
 .env.local
 .env.*
 
-# Logs and temp files
+# Logs
 *.log
+application/logs/*
+
+# Temporary files
 *.tmp
+*.temp
+Thumbs.db
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
 *.swp
 *.swo
 
-# Editors
-.vscode/
-.idea/
-
-# System files
-.DS_Store
-Thumbs.db
-
-# Coverage
+# Build/Cache
+build/
+dist/
+target/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 coverage/
 htmlcov/
 .coverage
 
-# Distribution / build artifacts
-dist/
-build/
-target/
-.gradle/
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+*.orig
 
-# Python specific
-.mypy_cache/
-.pytest_cache/
-
-# Compressed files
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
+# Database
+*.sql
+*.dump
+*.db
+```
