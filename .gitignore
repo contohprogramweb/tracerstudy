@@ -1,58 +1,59 @@
 ```
-# CodeIgniter specific
-application/logs/
-application/cache/
-application/config/config.php
-application/config/database.php
-system/
-user_guide/
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
+*.class
+*.exe
+*.dll
+*.so
+*.a
+*.out
 
 # Dependencies
-application/vendor/
-composer.lock
-
-# Environment
+node_modules/
+venv/
+.venv/
 .env
 .env.local
-.env.*
+*.env.*
 
-# Logs
+# Logs and temp files
 *.log
-application/logs/*
-
-# Temporary files
 *.tmp
-*.temp
-Thumbs.db
-.DS_Store
+*.swp
 
-# Editor
+# Editors
 .vscode/
 .idea/
-*.swp
-*.swo
 
-# Build/Cache
-build/
-dist/
-target/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
+# Coverage
 coverage/
 htmlcov/
 .coverage
 
-# OS
-.DS_Store
-Thumbs.db
-ehthumbs.db
-Icon?
-*.orig
-
-# Database
-*.sql
-*.dump
-*.db
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
 ```
