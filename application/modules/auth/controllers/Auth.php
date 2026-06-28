@@ -23,6 +23,7 @@ class Auth extends MY_Controller {
         $this->load->model('auth/User_model');
         $this->load->library('form_validation');
         $this->load->library('tracer_encryption');
+        $this->load->library('auth_lib'); // Load auth_lib
         $this->load->helper('date');
         
         // Jika sudah login, redirect ke dashboard sesuai role
