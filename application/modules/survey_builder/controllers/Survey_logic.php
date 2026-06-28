@@ -5,7 +5,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * Survey Logic Controller
  * Handles logic jump/conditional branching management
  */
-class Survey_logic extends CI_Controller {
+class Survey_logic extends MY_Controller {
 
     public function __construct() {
         parent::__construct();

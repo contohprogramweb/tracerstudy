@@ -20,7 +20,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @package Tracer Study
  * @subpackage IKU
  */
-class Iku extends CI_Controller {
+class Iku extends MY_Controller {
 
     protected $user_data;
     protected $is_cli;

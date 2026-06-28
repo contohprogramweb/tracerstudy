@@ -5,7 +5,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * Survey Question Controller
  * Handles question management within surveys
  */
-class Survey_question extends CI_Controller {
+class Survey_question extends MY_Controller {
 
     public function __construct() {
         parent::__construct();

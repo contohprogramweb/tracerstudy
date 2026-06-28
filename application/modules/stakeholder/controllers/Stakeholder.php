@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * - BR-SUR-006: Stakeholder survey wajib linked ke alumni atau prodi
  * - BR-SUR-007: Rating kompetensi di-average 60:40 (stakeholder:alumni)
  */
-class Stakeholder extends CI_Controller {
+class Stakeholder extends MY_Controller {
 
     public function __construct()
     {

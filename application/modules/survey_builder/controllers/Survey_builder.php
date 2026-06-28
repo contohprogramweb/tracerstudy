@@ -5,7 +5,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * Survey Builder Controller
  * Handles survey management: create, edit, publish, duplicate, preview
  */
-class Survey_builder extends CI_Controller {
+class Survey_builder extends MY_Controller {
 
     private $core_questions = [
         ['question_text' => 'Apakah Anda puas dengan kualitas pembelajaran di program studi Anda?', 'type' => 'rating', 'is_core' => 1],
