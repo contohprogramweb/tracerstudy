@@ -1,11 +1,13 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+require_once APPPATH . 'core/MY_Controller.php';
+
 /**
  * CLI Controller untuk Export Belmawa
  * Digunakan untuk background processing via cron job
  */
-class Export_cli extends CI_Controller {
+class Export_cli extends MY_Controller {
 
     public function __construct() {
         parent::__construct();

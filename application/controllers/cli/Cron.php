@@ -1,6 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+require_once APPPATH . 'core/MY_Controller.php';
+
 /**
  * Cron Controller
  * 
@@ -10,7 +12,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * Usage:
  * php index.php cli/cron/method_name [params]
  */
-class Cron extends CI_Controller {
+class Cron extends MY_Controller {
     
     protected $job_queue;
     

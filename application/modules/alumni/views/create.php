@@ -69,7 +69,7 @@
                         
                         <div class="mb-3">
                             <label class="form-label fw-bold">Tahun Lulus <span class="text-danger">*</span></label>
-                            <input type="number" name="tahun_lulus" class="form-control" value="<?php echo set_value('tahun_lulus', date('Y')); ?>" min="2000" max="<?php echo date('Y')+1); ?>" required>
+                            <input type="number" name="tahun_lulus" class="form-control" value="<?php echo set_value('tahun_lulus', date('Y')); ?>" min="2000" max="<?php echo date('Y')+1; ?>" required>
                         </div>
                         
                         <div class="mb-3">
