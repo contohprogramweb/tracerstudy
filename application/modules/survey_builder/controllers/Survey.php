@@ -18,7 +18,7 @@ require_once APPPATH . 'core/MY_Controller.php';
  * @package Tracer Study
  * @subpackage Survey
  */
-class Survey extends CI_Controller {
+class Survey extends MY_Controller {
 
     /**
      * Constructor

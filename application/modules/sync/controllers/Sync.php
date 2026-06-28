@@ -187,7 +187,8 @@ class Sync extends MY_Controller {
         if (!empty($result['errors'])) {
             echo "\nErrors:\n";
             foreach ($result['errors'] as $error) {
-                echo "  - NIM: {$error['nim'] ?? 'unknown'} | ";
+                $nim = isset($error['nim']) ? $error['nim'] : 'unknown';
+                echo "  - NIM: {$nim} | ";
                 echo "Error: " . (is_array($error['errors']) ? implode(', ', $error['errors']) : $error['error']) . "\n";
             }
         }

@@ -33,14 +33,16 @@ class Audit extends Admin_Controller {
         $data['page_subtitle'] = 'Monitoring Aktivitas Sistem';
         
         // Ambil list module unik untuk dropdown filter
-        $this->db->select DISTINCT('table_name');
+        $this->db->select('table_name');
+        $this->db->distinct();
         $this->db->where('table_name IS NOT NULL');
         $this->db->where('table_name !=', '');
         $modules = $this->db->get('activity_logs')->result_array();
         $data['modules'] = array_column($modules, 'table_name');
         
         // Ambil list action unik
-        $this->db->select DISTINCT('activity_type');
+        $this->db->select('activity_type');
+        $this->db->distinct();
         $actions = $this->db->get('activity_logs')->result_array();
         $data['actions'] = array_column($actions, 'activity_type');
         
