@@ -4,7 +4,7 @@
 # Enable Rewrite Engine
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /
+    RewriteBase /tracerstudy/
 
     # Redirect to HTTPS (Optional - uncomment if using SSL)
     # RewriteCond %{HTTPS} off
@@ -65,13 +65,13 @@ Options -Indexes
     Deny from all
 </FilesMatch>
 
-# Protect uploads directory
-<Directory "/public/uploads">
-    <FilesMatch "\.(php|phtml|php3|php4|php5|phps)$">
-        Order deny,allow
-        Deny from all
-    </FilesMatch>
-</Directory>
+# Protect uploads directory (Moved to main Apache config if needed)
+# Note: <Directory> directive cannot be used in .htaccess files
+# Files matching these extensions in uploads will be handled by application logic
+<FilesMatch "\.(php|phtml|php3|php4|php5|phps)$">
+    Order deny,allow
+    Deny from all
+</FilesMatch>
 
 # Cache control for static assets
 <IfModule mod_expires.c>
