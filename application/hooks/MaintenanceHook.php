@@ -31,7 +31,7 @@ class MaintenanceHook
     /**
      * Check if system is in maintenance mode
      *
-     * This hook runs before system initialization.
+     * This hook runs before controller execution.
      * If maintenance mode is enabled, it blocks access to all pages
      * except for admin users and specific maintenance pages.
      *
@@ -39,6 +39,9 @@ class MaintenanceHook
      */
     public function check_maintenance()
     {
+        // Get CodeIgniter instance (available at pre_controller stage)
+        $CI =& get_instance();
+        
         // Check if maintenance mode is enabled via config or file
         $maintenance_enabled = FALSE;
 
@@ -65,8 +68,8 @@ class MaintenanceHook
         }
 
         // Get current class and method
-        $class = $this->CI->router->class;
-        $method = $this->CI->router->method;
+        $class = $CI->router->class;
+        $method = $CI->router->method;
 
         // Define pages that are accessible during maintenance
         $allowed_pages = array(
@@ -80,20 +83,20 @@ class MaintenanceHook
         }
 
         // Check if user is admin (can bypass maintenance)
-        if ($this->CI->session->has_userdata('user_id')) {
-            $user_role = $this->CI->session->userdata('role');
+        if ($CI->session->has_userdata('user_id')) {
+            $user_role = $CI->session->userdata('role');
 
             if ($user_role === 'admin' || $user_role === 'superadmin') {
                 // Admins can bypass maintenance mode
                 // But show a notification
-                $this->CI->session->set_flashdata('warning', 'Sistem sedang dalam mode maintenance.');
+                $CI->session->set_flashdata('warning', 'Sistem sedang dalam mode maintenance.');
                 return;
             }
         }
 
         // For API requests, return JSON response
-        if ($this->CI->input->is_ajax_request() || strpos($this->CI->uri->uri_string(), 'api/') !== FALSE) {
-            $this->CI->output
+        if ($CI->input->is_ajax_request() || strpos($CI->uri->uri_string(), 'api/') !== FALSE) {
+            $CI->output
                 ->set_status_header(503)
                 ->set_content_type('application/json')
                 ->set_output(json_encode(array(
@@ -105,7 +108,7 @@ class MaintenanceHook
         }
 
         // Show maintenance page
-        $this->CI->output
+        $CI->output
             ->set_status_header(503)
             ->set_content_type('text/html')
             ->set_output($this->_get_maintenance_page());

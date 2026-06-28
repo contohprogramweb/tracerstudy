@@ -28,7 +28,7 @@ $hook['post_controller'] = array(
 );
 
 // MaintenanceHook - Check if system is in maintenance mode
-$hook['pre_system'] = array(
+$hook['pre_controller'][] = array(
     'class'    => 'MaintenanceHook',
     'function' => 'check_maintenance',
     'filename' => 'MaintenanceHook.php',
@@ -36,7 +36,7 @@ $hook['pre_system'] = array(
 );
 
 // Additional hook for session handling
-$hook['post_controller_constructor'] = array(
+$hook['post_controller_constructor'][] = array(
     'class'    => 'AuthHook',
     'function' => 'set_user_data',
     'filename' => 'AuthHook.php',
