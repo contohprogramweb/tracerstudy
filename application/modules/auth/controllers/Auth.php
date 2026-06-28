@@ -40,7 +40,7 @@ class Auth extends MY_Controller {
     public function login()
     {
         $data['title'] = 'Login - Tracer Study';
-        $data['page'] = 'auth/login';
+        $data['page'] = 'login';
 
         if ($this->input->post()) {
             $username = $this->input->post('username', TRUE);
