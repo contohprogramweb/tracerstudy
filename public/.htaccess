@@ -12,11 +12,11 @@
 
     # Prevent direct access to system folder
     RewriteCond %{REQUEST_URI} ^system.*
-    RewriteRule ^(.*)$ /index.php/$1 [L]
+    RewriteRule ^(.*)$ /tracerstudy/index.php/$1 [L]
 
     # Prevent direct access to application folder
     RewriteCond %{REQUEST_URI} ^application.*
-    RewriteRule ^(.*)$ /index.php/$1 [L]
+    RewriteRule ^(.*)$ /tracerstudy/index.php/$1 [L]
 
     # Remove index.php from URLs
     RewriteCond %{REQUEST_FILENAME} !-f
