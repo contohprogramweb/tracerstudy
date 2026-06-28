@@ -12,7 +12,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * - CLI: php index.php sync cliPddikti 2024 PRODI_ID
  * - Status: /sync/status/JOB_ID
  */
-class Sync extends CI_Controller {
+class Sync extends MY_Controller {
     
     protected $sync_library;
     protected $job_model;

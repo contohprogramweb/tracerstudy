@@ -5,7 +5,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * Controller untuk Export Data Belmawa
  * Menangani export template Excel sesuai format tracerstudy.kemdikbud.go.id
  */
-class Export extends CI_Controller {
+class Export extends MY_Controller {
 
     public function __construct() {
         parent::__construct();

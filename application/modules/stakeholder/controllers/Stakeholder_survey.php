@@ -5,7 +5,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * Controller: Stakeholder_survey
  * CRUD operations untuk survey stakeholder
  */
-class Stakeholder_survey extends CI_Controller {
+class Stakeholder_survey extends MY_Controller {
 
     public function __construct()
     {
