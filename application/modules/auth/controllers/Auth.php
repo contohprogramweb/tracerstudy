@@ -131,8 +131,22 @@ class Auth extends MY_Controller {
             $this->_log_activity($user_id, 'logout', 'Logout berhasil', $ip_address);
         }
 
+        // Hapus semua data session
         $this->session->sess_destroy();
-        redirect('login');
+        
+        // Hapus cache output untuk mencegah halaman ter-cache
+        $this->output->set_header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+        $this->output->set_header('Pragma: no-cache');
+        $this->output->set_header('Expires: 0');
+        
+        // Pastikan tidak ada output lain yang dikirim
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
+        
+        // Redirect ke halaman login dengan exit untuk memastikan script berhenti
+        redirect(site_url('login'), 'location');
+        exit;
     }
 
     /**

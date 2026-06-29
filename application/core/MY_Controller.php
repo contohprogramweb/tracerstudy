@@ -181,9 +181,15 @@ class Admin_Controller extends MY_Controller
     {
         parent::__construct();
 
+        // Set header untuk mencegah caching
+        $this->output->set_header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+        $this->output->set_header('Pragma: no-cache');
+        $this->output->set_header('Expires: 0');
+
         // Redirect ke login jika belum login
         if (!$this->is_logged_in) {
             redirect('auth/login');
+            exit;
         }
 
         // PERBAIKAN: Role yang diizinkan akses admin area
@@ -194,6 +200,7 @@ class Admin_Controller extends MY_Controller
 
         if (!in_array($user_role, $admin_roles)) {
             show_error('Akses ditolak. Anda tidak memiliki hak akses ke halaman ini.', 403);
+            exit;
         }
 
         $this->data['page_title'] = 'Admin Panel';
