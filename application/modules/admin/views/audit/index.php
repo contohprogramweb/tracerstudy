@@ -358,3 +358,13 @@ pre {
     font-size: 0.85rem;
 }
 </style>
+
+    </div>
+</div>
+
+<script>
+// Toggle sidebar untuk mobile
+document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+    document.getElementById('sidebar').classList.toggle('active');
+});
+</script>
