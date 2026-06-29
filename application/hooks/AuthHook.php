@@ -36,6 +36,11 @@ class AuthHook
      */
     public function check_auth()
     {
+        // Pastikan instance CI dan uri sudah terinisialisasi
+        if (!$this->CI || !isset($this->CI->uri)) {
+            return;
+        }
+        
         $uri = $this->CI->uri->uri_string();
 
         // Definisi URI publik yang tidak perlu autentikasi
