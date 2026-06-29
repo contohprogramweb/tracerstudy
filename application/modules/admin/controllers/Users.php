@@ -171,7 +171,18 @@ class Users extends Admin_Controller {
         }
         
         $data['user'] = $user;
-        $data['roles'] = ['super_admin', 'admin_pusat_karir', 'admin_prodi'];
+        
+        // Ambil semua role yang unik dari database, termasuk role user yang sedang diedit
+        $this->db->select('role', FALSE);
+        $this->db->distinct();
+        $roles_query = $this->db->get('users');
+        $db_roles = $roles_query->result_array();
+        $db_roles = array_column($db_roles, 'role');
+        
+        // Tambahkan role standar untuk admin
+        $standard_roles = ['super_admin', 'admin_pusat_karir', 'admin_prodi'];
+        $data['roles'] = array_unique(array_merge($standard_roles, $db_roles));
+        sort($data['roles']);
         
         $this->load->view('admin/templates/header', $data);
         $this->load->view('admin/users/form', $data);

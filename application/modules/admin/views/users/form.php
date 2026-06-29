@@ -46,9 +46,10 @@
                         <label class="form-label fw-bold">Role <span class="text-danger">*</span></label>
                         <select name="role" class="form-select" required>
                             <option value="">Pilih Role</option>
-                            <?php foreach ($roles as $role): ?>
-                            <option value="<?= $role ?>" <?= (isset($user['role']) && $user['role'] === $role) || set_value('role') === $role ? 'selected' : '' ?>>
-                                <?= str_replace('_', ' ', ucwords($role, '_')) ?>
+                            <?php foreach ($roles as $role_option): ?>
+                            <option value="<?= htmlspecialchars($role_option) ?>" 
+                                <?= (isset($user['role']) && $user['role'] == $role_option) || set_value('role') == $role_option ? 'selected' : '' ?>>
+                                <?= htmlspecialchars(str_replace('_', ' ', ucwords($role_option, '_'))) ?>
                             </option>
                             <?php endforeach; ?>
                         </select>
