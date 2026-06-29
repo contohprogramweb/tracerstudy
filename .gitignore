@@ -1,39 +1,52 @@
 ```
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
-*.class
-*.so
-*.dll
-*.exe
-*.out
+# CodeIgniter specific ignores
+application/logs/
+application/cache/
+application/config/database.php
+application/config/autoload.php
+application/config/config.php
+application/config/constants.php
+application/config/doctypes.php
+application/config/foreign_chars.php
+application/config/hooks.php
+application/config/memcached.php
+application/config/profiler.php
+application/config/routes.php
+application/config/smileys.php
+application/config/user_agents.php
 
-# Dependencies
-node_modules/
-venv/
-.venv/
+# Environment specific
 .env
 .env.local
 .env.*
 
-# Logs and temp files
+# Logs
 *.log
-*.tmp
+application/logs/*
+
+# Cache
+cache/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Dependencies
+node_modules/
+vendor/
+
+# IDE
+.vscode/
+.idea/
 *.swp
 *.swo
 
-# Editors
-.vscode/
-.idea/
-
-# OS generated files
+# OS
 .DS_Store
 Thumbs.db
 
-# Build directories
-dist/
+# Build artifacts
 build/
+dist/
 target/
 ```

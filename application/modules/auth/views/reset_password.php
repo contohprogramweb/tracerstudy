@@ -134,6 +134,7 @@
             <?php echo validation_errors('<div class="alert alert-warning">', '</div>'); ?>
             
             <form action="<?= site_url('reset-password/' . $token) ?>" method="post">
+                <?= form_hidden($this->security->get_csrf_token_name(), $this->security->get_csrf_hash()); ?>
                 <div class="mb-3">
                     <label for="password" class="form-label">Password Baru</label>
                     <div class="input-group">
