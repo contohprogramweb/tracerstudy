@@ -5,7 +5,7 @@ __pycache__/
 
 # Dependencies
 vendor/
-node_modules/
+composer.lock
 
 # Logs and temp files
 *.log
@@ -25,10 +25,20 @@ node_modules/
 .DS_Store
 Thumbs.db
 
-# CodeIgniter specific
+# Code coverage
+coverage/
+htmlcov/
+.coverage
+
+# PHP specific
+*.php~
+*.bak
+*.orig
+
+# Web application specific
 application/cache/
 application/logs/
+application/sessions/
 application/temp/
-system/database/
-!application/config/
+application/writable/
 ```

@@ -194,7 +194,7 @@
             <div class="user-menu">
                 <span><?= isset($user_data->username) ? htmlspecialchars($user_data->username) : 'User' ?></span>
                 <div class="user-avatar"><?= strtoupper(substr(isset($user_data->username) ? $user_data->username : 'U', 0, 1)) ?></div>
-                <a href="<?= base_url('auth/logout') ?>" class="btn btn-sm btn-outline-danger">
+                <a href="<?= base_url('logout') ?>" class="btn btn-sm btn-outline-danger">
                     <i class="bi bi-box-arrow-right"></i> Logout
                 </a>
             </div>

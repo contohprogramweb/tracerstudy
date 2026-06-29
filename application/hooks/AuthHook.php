@@ -56,6 +56,7 @@ class AuthHook
             'auth/verify-email',
             'auth/auth/verify_email',
             'auth/auth/verifyEmail',
+            'logout',
             'auth/logout',
             'auth/auth/logout',
             'stakeholder/verify',
