@@ -276,6 +276,7 @@ class Auth_lib {
             case 'admin_pusat_karir':
                 return 'admin/dashboard';
             case 'admin_prodi':
+            case 'admin_fakultas':
             case 'dosen':
                 return 'prodi/dashboard';
             case 'alumni':

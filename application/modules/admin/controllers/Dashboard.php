@@ -41,6 +41,15 @@ class Dashboard extends Admin_Controller {
         $this->db->where('role', 'admin_prodi');
         $data['total_admin_prodi'] = $this->db->count_all_results('users');
         
+        $this->db->where('role', 'admin_fakultas');
+        $data['total_admin_fakultas'] = $this->db->count_all_results('users');
+        
+        $this->db->where('role', 'dosen');
+        $data['total_dosen'] = $this->db->count_all_results('users');
+        
+        $this->db->where('role', 'reviewer');
+        $data['total_reviewer'] = $this->db->count_all_results('users');
+        
         $this->db->where('role', 'alumni');
         $data['total_alumni_users'] = $this->db->count_all_results('users');
         

@@ -216,7 +216,7 @@ class User_model extends MY_Model {
             return TRUE;
         }
 
-        if (in_array($user->role, array('admin_prodi', 'dosen'))) {
+        if (in_array($user->role, array('admin_prodi', 'admin_fakultas', 'dosen'))) {
             if ($user->profile_id == $prodi_id) {
                 return TRUE;
             }
@@ -276,6 +276,14 @@ class User_model extends MY_Model {
                 'survey'      => array('read'),
                 'iku'         => array('read'),
                 'kurikulum'   => array('create', 'read', 'update'),
+                'laporan'     => array('read', 'export'),
+                'stakeholder' => array('read')
+            ),
+            'admin_fakultas' => array(
+                'alumni'      => array('read', 'export'),
+                'survey'      => array('read'),
+                'iku'         => array('read'),
+                'kurikulum'   => array('read'),
                 'laporan'     => array('read', 'export'),
                 'stakeholder' => array('read')
             ),

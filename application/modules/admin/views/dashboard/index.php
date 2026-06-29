@@ -79,28 +79,40 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
-                        <div class="col-md-3">
-                            <div class="p-3 bg-primary bg-opacity-10 rounded text-center">
-                                <h4 class="mb-0 text-primary fw-bold"><?= number_format($total_super_admin) ?></h4>
+                        <div class="col-md-2">
+                            <div class="p-3 bg-danger bg-opacity-10 rounded text-center">
+                                <h4 class="mb-0 text-danger fw-bold"><?= number_format($total_super_admin) ?></h4>
                                 <small class="text-muted">Super Admin</small>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="p-3 bg-info bg-opacity-10 rounded text-center">
-                                <h4 class="mb-0 text-info fw-bold"><?= number_format($total_admin_pusat) ?></h4>
+                        <div class="col-md-2">
+                            <div class="p-3 bg-primary bg-opacity-10 rounded text-center">
+                                <h4 class="mb-0 text-primary fw-bold"><?= number_format($total_admin_pusat) ?></h4>
                                 <small class="text-muted">Admin Pusat Karir</small>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="p-3 bg-success bg-opacity-10 rounded text-center">
                                 <h4 class="mb-0 text-success fw-bold"><?= number_format($total_admin_prodi) ?></h4>
                                 <small class="text-muted">Admin Prodi</small>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="p-3 bg-secondary bg-opacity-10 rounded text-center">
-                                <h4 class="mb-0 text-secondary fw-bold"><?= number_format($total_alumni_users) ?></h4>
-                                <small class="text-muted">Alumni</small>
+                        <div class="col-md-2">
+                            <div class="p-3 bg-info bg-opacity-10 rounded text-center">
+                                <h4 class="mb-0 text-info fw-bold"><?= number_format($total_admin_fakultas) ?></h4>
+                                <small class="text-muted">Admin Fakultas</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="p-3 bg-teal bg-opacity-10 rounded text-center">
+                                <h4 class="mb-0 text-teal fw-bold"><?= number_format($total_dosen) ?></h4>
+                                <small class="text-muted">Dosen</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="p-3 bg-purple bg-opacity-10 rounded text-center">
+                                <h4 class="mb-0 text-purple fw-bold"><?= number_format($total_reviewer) ?></h4>
+                                <small class="text-muted">Reviewer</small>
                             </div>
                         </div>
                     </div>
