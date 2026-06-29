@@ -1,21 +1,41 @@
-# Compiled and build artifacts
-*.pyc
-__pycache__/
+```
+# CodeIgniter specific ignores
+application/logs/
+application/cache/
+application/config/autoload.php
+application/config/database.php
+application/config/config.php
+application/config/routes.php
 
-# Dependencies
-vendor/
-composer.lock
+# PHP related
+*.php~
+*.php.bak
+*.phtml~
+*.phtml.bak
 
-# Logs and temp files
+# Common ignores
 *.log
 *.tmp
 *.swp
+*~
+.DS_Store
+Thumbs.db
 
 # Environment
 .env
 .env.local
-*.env.*
+.env.*
 
-# Editors
+# Dependencies
+vendor/
+node_modules/
+
+# Build artifacts
+dist/
+build/
+target/
+
+# IDE
 .vscode/
 .idea/
+```
