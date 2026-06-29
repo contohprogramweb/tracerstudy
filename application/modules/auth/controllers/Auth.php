@@ -26,7 +26,9 @@ class Auth extends MY_Controller {
         $this->load->helper('date');
         
         // Jika sudah login, redirect ke dashboard sesuai role
-        if ($this->auth_lib->isLoggedIn()) {
+        // Kecuali sedang logout (untuk menghindari redirect loop)
+        $uri = $this->uri->uri_string();
+        if ($this->auth_lib->isLoggedIn() && strpos($uri, 'logout') === FALSE) {
             redirect($this->_get_dashboard_url());
         }
     }
@@ -128,7 +130,16 @@ class Auth extends MY_Controller {
         $ip_address = $this->input->ip_address();
 
         if ($user_id) {
-            $this->_log_activity($user_id, 'logout', 'Logout berhasil', $ip_address);
+            // Cek apakah user masih ada di database sebelum log activity
+            $this->load->model('auth/User_model');
+            $user = $this->User_model->getUserById($user_id);
+            
+            if ($user) {
+                $this->_log_activity($user_id, 'logout', 'Logout berhasil', $ip_address);
+            } else {
+                // User tidak ditemukan, log tanpa user_id (akan di-set NULL)
+                $this->_log_activity(null, 'logout', 'Logout berhasil (user tidak ditemukan)', $ip_address);
+            }
         }
 
         // Hapus semua data session
