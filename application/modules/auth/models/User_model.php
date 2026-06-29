@@ -4,13 +4,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /**
  * User Model
  * 
- * Menangani operasi database untuk user dengan support multi-role
+ * PERBAIKAN: Method disesuaikan dengan nama method yang ada di MY_Model
+ * (get_by, get_by_id, get_all, insert, update, dll.)
  */
 class User_model extends MY_Model {
 
     protected $table_name = 'users';
     protected $primary_key = 'id';
-    protected $soft_delete = FALSE; // Users tidak menggunakan soft delete
+    protected $soft_delete = FALSE;
 
     public function __construct()
     {
@@ -22,8 +23,12 @@ class User_model extends MY_Model {
      */
     public function getUserByUsernameOrEmail($username_or_email)
     {
-        return $this->where('(username = ? OR email = ?)', [$username_or_email, $username_or_email])
-                    ->first();
+        // MY_Model tidak punya where()->first() fluent chain,
+        // gunakan raw DB query
+        $this->db->where('username', $username_or_email);
+        $this->db->or_where('email', $username_or_email);
+        $query = $this->db->get($this->table_name);
+        return $query->row();
     }
 
     /**
@@ -31,7 +36,7 @@ class User_model extends MY_Model {
      */
     public function getUserByEmail($email)
     {
-        return $this->where('email', $email)->first();
+        return $this->get_by(array('email' => $email));
     }
 
     /**
@@ -39,24 +44,19 @@ class User_model extends MY_Model {
      */
     public function getUserById($id)
     {
-        return $this->find($id);
+        return $this->get_by_id($id);
     }
 
     /**
      * Create new user
-     * 
-     * @param array $data Data user
-     * @return int|bool User ID atau FALSE jika gagal
      */
     public function createUser($data)
     {
-        // Hash password jika ada
         if (isset($data['password'])) {
             $data['password_hash'] = password_hash($data['password'], PASSWORD_BCRYPT);
             unset($data['password']);
         }
 
-        // Set default status
         if (!isset($data['status'])) {
             $data['status'] = 'pending_verification';
         }
@@ -66,14 +66,9 @@ class User_model extends MY_Model {
 
     /**
      * Update user
-     * 
-     * @param int $id User ID
-     * @param array $data Data yang akan diupdate
-     * @return bool TRUE jika berhasil
      */
     public function updateUser($id, $data)
     {
-        // Hash password jika ada
         if (isset($data['password'])) {
             $data['password_hash'] = password_hash($data['password'], PASSWORD_BCRYPT);
             unset($data['password']);
@@ -84,65 +79,45 @@ class User_model extends MY_Model {
 
     /**
      * Verify email user
-     * 
-     * @param int $user_id User ID
-     * @return bool TRUE jika berhasil
      */
     public function verifyEmail($user_id)
     {
-        $data = [
-            'status' => 'active',
+        return $this->update($user_id, array(
+            'status'     => 'active',
             'updated_at' => date('Y-m-d H:i:s')
-        ];
-
-        return $this->update($user_id, $data);
+        ));
     }
 
     /**
      * Update last login timestamp
-     * 
-     * @param int $user_id User ID
-     * @return bool TRUE jika berhasil
      */
     public function updateLastLogin($user_id)
     {
-        $data = [
+        return $this->update($user_id, array(
             'last_login' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s')
-        ];
-
-        return $this->update($user_id, $data);
+        ));
     }
 
     /**
      * Save reset password token
-     * 
-     * @param int $user_id User ID
-     * @param string $token Reset token
-     * @param string $expires_at Expiration time
-     * @return bool TRUE jika berhasil
      */
     public function saveResetToken($user_id, $token, $expires_at)
     {
-        $data = [
-            'reset_token' => hash('sha256', $token),
+        return $this->update($user_id, array(
+            'reset_token'         => hash('sha256', $token),
             'reset_token_expires' => $expires_at,
-            'updated_at' => date('Y-m-d H:i:s')
-        ];
-
-        return $this->update($user_id, $data);
+            'updated_at'          => date('Y-m-d H:i:s')
+        ));
     }
 
     /**
      * Validate reset token
-     * 
-     * @param string $token Reset token
-     * @return object|FALSE User data jika valid, FALSE jika tidak
      */
     public function validateResetToken($token)
     {
         $hashed_token = hash('sha256', $token);
-        $now = date('Y-m-d H:i:s');
+        $now          = date('Y-m-d H:i:s');
 
         $this->db->where('reset_token', $hashed_token);
         $this->db->where('reset_token_expires >', $now);
@@ -154,48 +129,34 @@ class User_model extends MY_Model {
 
     /**
      * Reset password
-     * 
-     * @param int $user_id User ID
-     * @param string $new_password New password
-     * @return bool TRUE jika berhasil
      */
     public function resetPassword($user_id, $new_password)
     {
-        $data = [
-            'password_hash' => password_hash($new_password, PASSWORD_BCRYPT),
-            'reset_token' => NULL,
+        return $this->update($user_id, array(
+            'password_hash'       => password_hash($new_password, PASSWORD_BCRYPT),
+            'reset_token'         => NULL,
             'reset_token_expires' => NULL,
-            'updated_at' => date('Y-m-d H:i:s')
-        ];
-
-        return $this->update($user_id, $data);
+            'updated_at'          => date('Y-m-d H:i:s')
+        ));
     }
 
     /**
      * Invalidate reset token
-     * 
-     * @param string $token Reset token
-     * @return bool TRUE jika berhasil
      */
     public function invalidateResetToken($token)
     {
         $hashed_token = hash('sha256', $token);
 
-        $data = [
-            'reset_token' => NULL,
+        $this->db->where('reset_token', $hashed_token);
+        return $this->db->update($this->table_name, array(
+            'reset_token'         => NULL,
             'reset_token_expires' => NULL,
-            'updated_at' => date('Y-m-d H:i:s')
-        ];
-
-        return $this->db->where('reset_token', $hashed_token)
-                        ->update($this->table_name, $data);
+            'updated_at'          => date('Y-m-d H:i:s')
+        ));
     }
 
     /**
      * Get user by verification token
-     * 
-     * @param string $token Verification token
-     * @return object|FALSE User data jika ditemukan
      */
     public function getUserByVerificationToken($token)
     {
@@ -210,89 +171,61 @@ class User_model extends MY_Model {
 
     /**
      * Save verification token
-     * 
-     * @param int $user_id User ID
-     * @param string $token Verification token
-     * @param string $expires_at Expiration time
-     * @return bool TRUE jika berhasil
      */
     public function saveVerificationToken($user_id, $token, $expires_at)
     {
-        $data = [
-            'verification_token' => hash('sha256', $token),
+        return $this->update($user_id, array(
+            'verification_token'         => hash('sha256', $token),
             'verification_token_expires' => $expires_at,
-            'updated_at' => date('Y-m-d H:i:s')
-        ];
-
-        return $this->update($user_id, $data);
+            'updated_at'                 => date('Y-m-d H:i:s')
+        ));
     }
 
     /**
      * Check if user has permission
-     * 
-     * @param int $user_id User ID
-     * @param string $module Module name
-     * @param string $action Action name
-     * @return bool TRUE jika memiliki permission
      */
     public function hasPermission($user_id, $module, $action)
     {
-        $user = $this->find($user_id);
-        
+        $user = $this->get_by_id($user_id);
+
         if (!$user) {
             return FALSE;
         }
 
-        // Super admin memiliki semua permission
         if ($user->role === 'super_admin') {
             return TRUE;
         }
 
-        // Check permission berdasarkan role dan module
-        // Implementasi bisa disesuaikan dengan tabel permissions jika ada
         $role_permissions = $this->_getRolePermissions($user->role);
 
-        if (isset($role_permissions[$module]) && in_array($action, $role_permissions[$module])) {
-            return TRUE;
-        }
-
-        return FALSE;
+        return isset($role_permissions[$module]) && in_array($action, $role_permissions[$module]);
     }
 
     /**
      * Check if user has access to prodi
-     * 
-     * @param int $user_id User ID
-     * @param int $prodi_id Prodi ID
-     * @return bool TRUE jika memiliki akses
      */
     public function hasProdiAccess($user_id, $prodi_id)
     {
-        $user = $this->find($user_id);
-        
+        $user = $this->get_by_id($user_id);
+
         if (!$user) {
             return FALSE;
         }
 
-        // Super admin dan admin_pusat_karir memiliki akses ke semua prodi
-        if (in_array($user->role, ['super_admin', 'admin_pusat_karir'])) {
+        if (in_array($user->role, array('super_admin', 'admin_pusat_karir'))) {
             return TRUE;
         }
 
-        // Admin prodi dan dosen hanya memiliki akses ke prodi tertentu
-        // Cek dari profile_id atau tabel user_prodi_access jika ada
-        if (in_array($user->role, ['admin_prodi', 'dosen'])) {
-            // Asumsi profile_id menyimpan prodi_id untuk admin_prodi dan dosen
+        if (in_array($user->role, array('admin_prodi', 'dosen'))) {
             if ($user->profile_id == $prodi_id) {
                 return TRUE;
             }
 
-            // Cek dari tabel user_prodi_access jika ada
             $this->db->where('user_id', $user_id);
             $this->db->where('prodi_id', $prodi_id);
             $query = $this->db->get('user_prodi_access');
-            
-            if ($query->num_rows() > 0) {
+
+            if ($query && $query->num_rows() > 0) {
                 return TRUE;
             }
         }
@@ -301,87 +234,66 @@ class User_model extends MY_Model {
     }
 
     /**
-     * Get role permissions
-     * 
-     * @param string $role Role name
-     * @return array Permission mapping
-     */
-    private function _getRolePermissions($role)
-    {
-        // Default permissions per role
-        $permissions = [
-            'super_admin' => [
-                'alumni' => ['create', 'read', 'update', 'delete', 'export'],
-                'survey' => ['create', 'read', 'update', 'delete', 'publish'],
-                'iku' => ['create', 'read', 'update', 'delete', 'calculate'],
-                'kurikulum' => ['create', 'read', 'update', 'delete'],
-                'laporan' => ['create', 'read', 'export'],
-                'stakeholder' => ['create', 'read', 'update', 'delete'],
-                'users' => ['create', 'read', 'update', 'delete']
-            ],
-            'admin_pusat_karir' => [
-                'alumni' => ['create', 'read', 'update', 'export'],
-                'survey' => ['create', 'read', 'update', 'publish'],
-                'iku' => ['read', 'calculate'],
-                'kurikulum' => ['read'],
-                'laporan' => ['create', 'read', 'export'],
-                'stakeholder' => ['create', 'read', 'update']
-            ],
-            'admin_prodi' => [
-                'alumni' => ['create', 'read', 'update'],
-                'survey' => ['read'],
-                'iku' => ['read'],
-                'kurikulum' => ['create', 'read', 'update'],
-                'laporan' => ['read', 'export'],
-                'stakeholder' => ['read']
-            ],
-            'dosen' => [
-                'alumni' => ['read'],
-                'survey' => ['read'],
-                'iku' => ['read'],
-                'kurikulum' => ['read'],
-                'laporan' => ['read']
-            ],
-            'reviewer' => [
-                'alumni' => ['read'],
-                'survey' => ['read'],
-                'iku' => ['read'],
-                'laporan' => ['read']
-            ]
-        ];
-
-        return isset($permissions[$role]) ? $permissions[$role] : [];
-    }
-
-    /**
      * Get users by role
-     * 
-     * @param string $role Role name
-     * @return array Array of users
      */
     public function getUsersByRole($role)
     {
-        return $this->where('role', $role)->findAll();
+        return $this->get_all(array('role' => $role));
     }
 
     /**
      * Get active users
-     * 
-     * @return array Array of active users
      */
     public function getActiveUsers()
     {
-        return $this->where('status', 'active')->findAll();
+        return $this->get_all(array('status' => 'active'));
     }
 
     /**
      * Count users by role
-     * 
-     * @param string $role Role name
-     * @return int Count
      */
     public function countByRole($role)
     {
-        return $this->where('role', $role)->countAll();
+        return $this->count(array('role' => $role));
+    }
+
+    /**
+     * Get role permissions mapping
+     */
+    private function _getRolePermissions($role)
+    {
+        $permissions = array(
+            'admin_pusat_karir' => array(
+                'alumni'      => array('create', 'read', 'update', 'export'),
+                'survey'      => array('create', 'read', 'update', 'publish'),
+                'iku'         => array('read', 'calculate'),
+                'kurikulum'   => array('read'),
+                'laporan'     => array('create', 'read', 'export'),
+                'stakeholder' => array('create', 'read', 'update')
+            ),
+            'admin_prodi' => array(
+                'alumni'      => array('create', 'read', 'update'),
+                'survey'      => array('read'),
+                'iku'         => array('read'),
+                'kurikulum'   => array('create', 'read', 'update'),
+                'laporan'     => array('read', 'export'),
+                'stakeholder' => array('read')
+            ),
+            'dosen' => array(
+                'alumni'    => array('read'),
+                'survey'    => array('read'),
+                'iku'       => array('read'),
+                'kurikulum' => array('read'),
+                'laporan'   => array('read')
+            ),
+            'reviewer' => array(
+                'alumni'  => array('read'),
+                'survey'  => array('read'),
+                'iku'     => array('read'),
+                'laporan' => array('read')
+            )
+        );
+
+        return isset($permissions[$role]) ? $permissions[$role] : array();
     }
 }

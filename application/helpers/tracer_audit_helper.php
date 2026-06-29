@@ -35,18 +35,23 @@ if (!function_exists('audit_log')) {
             $user_id = $user_data['id'] ?? null;
         }
         
-        // Siapkan data untuk insert
+        // PERBAIKAN: Sesuaikan nama kolom dengan schema tabel activity_logs
+        $desc_str = is_array($description) 
+            ? json_encode($description, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) 
+            : $description;
+
         $data = [
-            'user_id'       => $user_id,
-            'activity_type' => $action,
-            'table_name'    => $module,
-            'record_id'     => null, // Bisa diisi manual jika perlu
-            'old_values'    => $old_values !== null ? json_encode($old_values, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null,
-            'new_values'    => $new_values !== null ? json_encode($new_values, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null,
-            'description'   => is_array($description) ? json_encode($description, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : $description,
-            'ip_address'    => $CI->input->ip_address(),
-            'user_agent'    => $CI->agent->agent_string() ?? null,
-            'created_at'    => date('Y-m-d H:i:s')
+            'user_id'    => $user_id,
+            'action'     => $action,
+            'module'     => $module,
+            'table_name' => $module,
+            'record_id'  => null,
+            'old_values' => $old_values !== null ? json_encode($old_values, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null,
+            'new_values' => $new_values !== null 
+                ? json_encode($new_values, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) 
+                : ($desc_str ? json_encode(['description' => $desc_str]) : null),
+            'ip_address' => $CI->input->ip_address(),
+            'user_agent' => $CI->input->user_agent(),
         ];
         
         // Insert ke database - BR-SEC-001: Tidak bisa dihapus

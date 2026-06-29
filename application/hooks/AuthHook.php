@@ -30,46 +30,58 @@ class AuthHook
 
     /**
      * Check if user is authenticated
-     *
-     * This hook runs before controller execution.
-     * It checks if the current page requires authentication.
-     *
-     * @return void
+     * PERBAIKAN: Menggunakan URI string, bukan router class,
+     * karena pada HMVC nama class bisa berupa "auth" (module name)
+     * sementara controller sebenarnya ada di dalam modul.
      */
     public function check_auth()
     {
-        // Get current class and method
-        $class = $this->CI->router->class;
-        $method = $this->CI->router->method;
+        $uri = $this->CI->uri->uri_string();
 
-        // Define public pages that don't require authentication
-        $public_pages = array(
-            'auth' => array('login', 'register', 'forgot_password', 'reset_password'),
-            'welcome' => array('index')
+        // Definisi URI publik yang tidak perlu autentikasi
+        $public_uri_prefixes = array(
+            'auth/login',
+            'auth/auth/login',
+            'auth/register',
+            'auth/auth/register',
+            'auth/forgot-password',
+            'auth/auth/forgot_password',
+            'auth/reset-password',
+            'auth/auth/reset_password',
+            'auth/verify-email',
+            'auth/auth/verify_email',
+            'auth/auth/verifyEmail',
+            'stakeholder/verify',
+            'stakeholder/stakeholder/verify',
         );
 
-        // Check if current page is public
-        if (isset($public_pages[$class]) && in_array($method, $public_pages[$class])) {
+        // Juga izinkan akses ke root / default controller (redirect ke login)
+        if (empty($uri) || $uri === '/') {
             return;
         }
 
-        // Check if user is logged in
-        $is_logged_in = $this->CI->session->has_userdata('user_id');
+        foreach ($public_uri_prefixes as $prefix) {
+            if (strpos($uri, $prefix) === 0) {
+                return;
+            }
+        }
+
+        // Cek apakah sudah login
+        $is_logged_in = $this->CI->session->has_userdata('user_id') 
+                        && $this->CI->session->userdata('logged_in');
 
         if (!$is_logged_in) {
-            // For API requests, return JSON response
-            if ($this->CI->input->is_ajax_request() || strpos($this->CI->uri->uri_string(), 'api/') !== FALSE) {
+            if ($this->CI->input->is_ajax_request() || strpos($uri, 'api/') !== FALSE) {
                 $this->CI->output
                     ->set_status_header(401)
                     ->set_content_type('application/json')
                     ->set_output(json_encode(array(
-                        'status' => 'error',
+                        'status'  => 'error',
                         'message' => 'Unauthorized. Please login first.'
                     )));
                 exit;
             }
 
-            // Redirect to login page
             $this->CI->session->set_flashdata('info', 'Silakan login untuk mengakses halaman ini.');
             redirect('auth/login');
         }

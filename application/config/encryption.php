@@ -54,7 +54,8 @@ $config['encryption_mode'] = 'cbc';
  * 
  * Jika NULL, akan menggunakan nilai dari config['encryption_key'] utama
  */
-$config['encryption_key'] = NULL; // Gunakan dari config.php utama
+// PERBAIKAN: Jangan set encryption_key di sini - gunakan nilai dari config.php utama
+// $config['encryption_key'] sudah di-set di config.php dengan nilai statis
 
 /**
  * Encryption HMAC Key

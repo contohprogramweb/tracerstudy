@@ -44,11 +44,27 @@ class MY_Controller extends CI_Controller
         $this->load->library('session');
         $this->load->helper(array('url', 'form', 'security'));
 
+        // Load Auth library - available in all controllers
+        // PERBAIKAN: Dipindahkan dari autoload ke sini agar HMVC sudah siap
+        // saat Auth_lib mencoba load User_model dari modul auth/
+        $this->load->library('auth_lib');
+
         // Check if user is logged in
-        $this->is_logged_in = $this->session->has_userdata('user_id');
+        $this->is_logged_in = $this->session->has_userdata('user_id')
+                              && $this->session->userdata('logged_in') === TRUE;
 
         if ($this->is_logged_in) {
-            $this->user_data = $this->session->userdata('user_data');
+            // PERBAIKAN: Auth controller tidak menyimpan 'user_data' key terpisah,
+            // melainkan menyimpan langsung (user_id, username, role, dll).
+            // Bangun object user_data dari session keys yang ada.
+            $this->user_data = (object) array(
+                'id'                => $this->session->userdata('user_id'),
+                'username'          => $this->session->userdata('username'),
+                'email'             => $this->session->userdata('email'),
+                'role'              => $this->session->userdata('role'),
+                'profile_id'        => $this->session->userdata('profile_id'),
+                'is_email_verified' => $this->session->userdata('is_email_verified'),
+            );
         }
 
         // Set default data for views
@@ -58,10 +74,10 @@ class MY_Controller extends CI_Controller
         $this->data['is_logged_in'] = $this->is_logged_in;
         $this->data['user_data'] = $this->user_data;
 
-        // CSRF Protection
-        if (config_item('csrf_protection') === TRUE) {
-            $this->security->csrf_verify();
-        }
+        // CATATAN: CSRF verification ditangani otomatis oleh CI
+        // ketika csrf_protection = TRUE di config.php.
+        // Jangan panggil $this->security->csrf_verify() manual
+        // karena akan menyebabkan double-check dan false positive error.
     }
 
     /**
@@ -165,17 +181,21 @@ class Admin_Controller extends MY_Controller
     {
         parent::__construct();
 
-        // Check if user is admin
+        // Redirect ke login jika belum login
         if (!$this->is_logged_in) {
             redirect('auth/login');
         }
 
-        // Check user role (implementasi sesuai kebutuhan)
-        if (!isset($this->user_data->role) || $this->user_data->role !== 'admin') {
+        // PERBAIKAN: Role yang diizinkan akses admin area
+        // (sebelumnya hanya cek 'admin' tapi role sebenarnya adalah
+        //  'super_admin' dan 'admin_pusat_karir')
+        $admin_roles = array('super_admin', 'admin_pusat_karir', 'admin');
+        $user_role   = $this->session->userdata('role');
+
+        if (!in_array($user_role, $admin_roles)) {
             show_error('Akses ditolak. Anda tidak memiliki hak akses ke halaman ini.', 403);
         }
 
-        // Load admin specific libraries/helpers
         $this->data['page_title'] = 'Admin Panel';
     }
 }

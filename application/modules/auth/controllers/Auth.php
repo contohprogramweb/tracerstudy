@@ -23,13 +23,21 @@ class Auth extends MY_Controller {
         $this->load->model('auth/User_model');
         $this->load->library('form_validation');
         $this->load->library('tracer_encryption');
-        $this->load->library('auth_lib'); // Load auth_lib
         $this->load->helper('date');
         
         // Jika sudah login, redirect ke dashboard sesuai role
         if ($this->auth_lib->isLoggedIn()) {
             redirect($this->_get_dashboard_url());
         }
+    }
+
+    /**
+     * index() - alias ke login()
+     * Diperlukan karena CI memanggil index() saat controller dimuat tanpa method
+     */
+    public function index()
+    {
+        $this->login();
     }
 
     /**
@@ -40,7 +48,6 @@ class Auth extends MY_Controller {
     public function login()
     {
         $data['title'] = 'Login - Tracer Study';
-        $data['page'] = 'login';
 
         if ($this->input->post()) {
             $username = $this->input->post('username', TRUE);
@@ -59,7 +66,7 @@ class Auth extends MY_Controller {
             $this->form_validation->set_rules('password', 'Password', 'required|trim');
 
             if ($this->form_validation->run() == FALSE) {
-                $this->load->view('templates/auth_layout', $data);
+                $this->load->view('login', $data);
                 return;
             }
 
@@ -108,7 +115,7 @@ class Auth extends MY_Controller {
             }
         }
 
-        $this->load->view('templates/auth_layout', $data);
+        $this->load->view('login', $data);
     }
 
     /**
@@ -141,7 +148,7 @@ class Auth extends MY_Controller {
             $this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email');
 
             if ($this->form_validation->run() == FALSE) {
-                $this->load->view('templates/auth_layout', $data);
+                $this->load->view('forgot_password', $data);
                 return;
             }
 
@@ -171,7 +178,7 @@ class Auth extends MY_Controller {
             redirect('forgot-password');
         }
 
-        $this->load->view('templates/auth_layout', $data);
+        $this->load->view('forgot_password', $data);
     }
 
     /**
@@ -198,7 +205,7 @@ class Auth extends MY_Controller {
             $this->form_validation->set_rules('confirm_password', 'Konfirmasi Password', 'required|trim|matches[password]');
 
             if ($this->form_validation->run() == FALSE) {
-                $this->load->view('templates/auth_layout', $data);
+                $this->load->view('reset_password', $data);
                 return;
             }
 
@@ -220,7 +227,7 @@ class Auth extends MY_Controller {
             }
         }
 
-        $this->load->view('templates/auth_layout', $data);
+        $this->load->view('reset_password', $data);
     }
 
     /**
@@ -274,28 +281,17 @@ class Auth extends MY_Controller {
     {
         $this->load->database();
         
-        // Hitung jumlah attempt dalam 1 menit terakhir
-        $one_minute_ago = date('Y-m-d H:i:s', strtotime('-1 minute'));
+        // Hitung jumlah attempt dalam 30 menit terakhir (sesuai lockout_duration)
+        // PERBAIKAN: Sesuaikan nama kolom dengan schema tabel login_attempts
+        $lockout_ago = date('Y-m-d H:i:s', strtotime('-' . $this->lockout_duration . ' seconds'));
         
         $this->db->where('ip_address', $ip_address);
-        $this->db->where('attempt_time >=', $one_minute_ago);
-        $this->db->where('success', 0);
+        $this->db->where('attempted_at >=', $lockout_ago);
         $query = $this->db->get('login_attempts');
         
-        $failed_attempts = $query->num_rows();
+        $attempt_count = $query->num_rows();
         
-        if ($failed_attempts >= $this->max_login_attempts) {
-            // Cek apakah ada lockout aktif
-            $last_attempt = $query->row();
-            if ($last_attempt) {
-                $time_since_last = time() - strtotime($last_attempt->attempt_time);
-                if ($time_since_last < $this->lockout_duration) {
-                    return TRUE; // Masih dalam lockout period
-                }
-            }
-        }
-        
-        return FALSE;
+        return ($attempt_count >= $this->max_login_attempts);
     }
 
     /**
@@ -305,16 +301,23 @@ class Auth extends MY_Controller {
     {
         $this->load->database();
         
+        // PERBAIKAN: Sesuaikan kolom dengan schema tabel login_attempts
+        // ip_address VARBINARY(16) - simpan sebagai inet_pton() atau string
+        // login_type ENUM('email','username') - deteksi berdasarkan format
+        $login_type = (strpos($username, '@') !== FALSE) ? 'email' : 'username';
+        
         $data = [
-            'ip_address' => $ip_address,
-            'username' => $username,
-            'success' => $success ? 1 : 0
+            'ip_address'        => $ip_address,
+            'login_type'        => $login_type,
+            'login_identifier'  => substr($username, 0, 100),
+            'user_agent'        => $this->input->user_agent()
         ];
         
         $this->db->insert('login_attempts', $data);
         
-        // Cleanup old records (lebih dari 24 jam)
-        $this->db->delete('login_attempts', ['attempt_time <' => date('Y-m-d H:i:s', strtotime('-24 hours'))]);
+        // Cleanup records lebih dari 24 jam
+        $this->db->where('attempted_at <', date('Y-m-d H:i:s', strtotime('-24 hours')));
+        $this->db->delete('login_attempts');
     }
 
     /**
@@ -324,12 +327,15 @@ class Auth extends MY_Controller {
     {
         $this->load->database();
         
+        // PERBAIKAN: Sesuaikan kolom dengan schema tabel activity_logs
         $data = [
-            'user_id' => $user_id,
-            'activity_type' => $activity_type,
-            'description' => $description,
+            'user_id'    => $user_id,
+            'action'     => $activity_type,
+            'module'     => 'auth',
+            'table_name' => 'users',
+            'new_values' => json_encode(['description' => $description]),
             'ip_address' => $ip_address ?: $this->input->ip_address(),
-            'user_agent' => $this->input->user_agent()
+            'user_agent' => $this->input->user_agent(),
         ];
         
         $this->db->insert('activity_logs', $data);
@@ -412,4 +418,65 @@ class Auth extends MY_Controller {
                 return 'dashboard';
         }
     }
+
+    /**
+     * User Profile page
+     */
+    public function profile()
+    {
+        if (!$this->auth_lib->isLoggedIn()) {
+            redirect('auth/login');
+        }
+
+        $user_id   = $this->session->userdata('user_id');
+        $user      = $this->User_model->getUserById($user_id);
+
+        if (!$user) {
+            show_error('User tidak ditemukan.', 404);
+        }
+
+        $data = array(
+            'title'     => 'Profil Saya - Tracer Study',
+            'user'      => $user,
+        );
+
+        $this->load->view('profile', $data);
+    }
+
+    /**
+     * Change Password page
+     */
+    public function changePassword()
+    {
+        if (!$this->auth_lib->isLoggedIn()) {
+            redirect('auth/login');
+        }
+
+        if ($this->input->method() === 'post') {
+            $user_id      = $this->session->userdata('user_id');
+            $old_password = $this->input->post('old_password');
+            $new_password = $this->input->post('new_password');
+            $confirm      = $this->input->post('confirm_password');
+
+            if ($new_password !== $confirm) {
+                $this->session->set_flashdata('error', 'Konfirmasi password tidak cocok.');
+                redirect('auth/change-password');
+            }
+
+            $user = $this->User_model->getUserById($user_id);
+
+            if (!$user || !password_verify($old_password, $user->password_hash)) {
+                $this->session->set_flashdata('error', 'Password lama tidak benar.');
+                redirect('auth/change-password');
+            }
+
+            $this->User_model->updateUser($user_id, array('password' => $new_password));
+            $this->session->set_flashdata('success', 'Password berhasil diubah.');
+            redirect('auth/change-password');
+        }
+
+        $data = array('title' => 'Ganti Password - Tracer Study');
+        $this->load->view('change_password', $data);
+    }
+
 }

@@ -38,17 +38,24 @@ class AuditHook {
             }
         }
 
+        // PERBAIKAN: Sesuaikan nama kolom dengan schema tabel activity_logs
+        // Kolom: action, module, table_name, record_id, old_values, new_values, ip_address, user_agent
+        $desc_str = is_array($description) 
+            ? json_encode($description, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) 
+            : $description;
+
         $data = [
-            'user_id'       => $user_id,
-            'activity_type' => $action,
-            'table_name'    => $module,
-            'record_id'     => null,
-            'old_values'    => $old_val !== null ? json_encode($old_val, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null,
-            'new_values'    => $new_val !== null ? json_encode($new_val, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null,
-            'description'   => is_array($description) ? json_encode($description, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : $description,
-            'ip_address'    => $this->CI->input->ip_address(),
-            'user_agent'    => $this->CI->agent->agent_string() ?? null,
-            'created_at'    => date('Y-m-d H:i:s')
+            'user_id'    => $user_id,
+            'action'     => $action,           // 'activity_type' -> 'action'
+            'module'     => $module,
+            'table_name' => $module,
+            'record_id'  => null,
+            'old_values' => $old_val !== null ? json_encode($old_val, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null,
+            'new_values' => $new_val !== null 
+                ? json_encode($new_val, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) 
+                : ($desc_str ? json_encode(['description' => $desc_str]) : null),
+            'ip_address' => $this->CI->input->ip_address(),
+            'user_agent' => $this->CI->input->user_agent(),
         ];
 
         try {
@@ -61,16 +68,38 @@ class AuditHook {
     }
 
     /**
+     * log_activity - dipanggil via post_controller hook (terdaftar di hooks.php)
+     * Hanya mencatat request POST/PUT/DELETE yang mengubah data
+     */
+    public function log_activity() {
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        if ($method === 'GET') {
+            return;
+        }
+
+        if (!$this->CI->session->userdata('logged_in')) {
+            return;
+        }
+
+        $user_id = $this->CI->session->userdata('user_id');
+
+        $this->log(
+            strtolower($method),
+            $this->CI->router->class . '/' . $this->CI->router->method,
+            'Request: ' . $this->CI->uri->uri_string(),
+            $user_id
+        );
+    }
+
+    /**
      * Hook yang dipanggil setelah constructor controller
-     * Bisa digunakan untuk logging global
      */
     public function postControllerConstructor() {
-        // Bisa digunakan untuk tracking request global
+        // Tracking global request - opsional
     }
 
     /**
      * Hook yang dipanggil sebelum shutdown
-     * Bisa digunakan untuk cleanup atau final logging
      */
     public function postSystem() {
         // Final logging jika diperlukan

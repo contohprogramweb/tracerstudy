@@ -12,7 +12,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 
 // AuthHook - Check authentication before accessing protected pages
-$hook['pre_controller'] = array(
+$hook['pre_controller'][] = array(
     'class'    => 'AuthHook',
     'function' => 'check_auth',
     'filename' => 'AuthHook.php',
@@ -20,7 +20,7 @@ $hook['pre_controller'] = array(
 );
 
 // AuditHook - Log user activities for audit trail
-$hook['post_controller'] = array(
+$hook['post_controller'][] = array(
     'class'    => 'AuditHook',
     'function' => 'log_activity',
     'filename' => 'AuditHook.php',
@@ -28,6 +28,8 @@ $hook['post_controller'] = array(
 );
 
 // MaintenanceHook - Check if system is in maintenance mode
+// PERBAIKAN: Diubah dari pre_system ke pre_controller karena
+// pre_system dipanggil sebelum CI diinisialisasi (get_instance() belum tersedia)
 $hook['pre_controller'][] = array(
     'class'    => 'MaintenanceHook',
     'function' => 'check_maintenance',

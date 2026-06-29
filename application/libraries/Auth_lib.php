@@ -23,7 +23,8 @@ class Auth_lib {
     {
         $this->CI =& get_instance();
         $this->CI->load->database();
-        $this->CI->load->model('auth/User_model');
+        // PERBAIKAN: Load model dengan prefix modul HMVC
+        $this->CI->load->model('auth/User_model', 'User_model');
     }
 
     /**

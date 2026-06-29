@@ -51,7 +51,7 @@ $config['index_page'] = 'index.php';
 |
 | WARNING: If you set this to 'PATH_INFO', URIs will always be URL-decoded!
 */
-$config['uri_protocol'] = 'AUTO';
+$config['uri_protocol'] = 'REQUEST_URI';
 
 /*
 |--------------------------------------------------------------------------
@@ -137,7 +137,10 @@ $config['subclass_prefix'] = 'MY_';
 | Note: This will NOT disable or override the CodeIgniter-specific
 |	autoloading (application/config/autoload.php)
 */
-$config['composer_autoload'] = FCPATH.'vendor/autoload.php';
+// PERBAIKAN: vendor/ ada di root project, bukan di dalam public/
+// Gunakan FALSE jika belum jalankan 'composer install'
+$vendor_autoload = APPPATH . '../vendor/autoload.php';
+$config['composer_autoload'] = file_exists($vendor_autoload) ? $vendor_autoload : FALSE;
 
 /*
 |--------------------------------------------------------------------------
@@ -312,7 +315,10 @@ $config['cache_query_string'] = FALSE;
 | https://codeigniter.com/userguide3/libraries/encryption.html
 |
 */
-$config['encryption_key'] = base64_encode(random_bytes(32));
+// PENTING: Ganti nilai ini dengan key statis yang kuat, jangan gunakan random_bytes() 
+// karena akan berubah setiap request dan merusak session/cookie.
+// Generate sekali: php -r "echo base64_encode(random_bytes(32));"
+$config['encryption_key'] = 'GANTI_DENGAN_KEY_STATIS_32_KARAKTER_ANDA_DISINI';
 
 /*
 |--------------------------------------------------------------------------
@@ -509,3 +515,18 @@ $config['rewrite_short_tags'] = FALSE;
 | Array:		array('10.0.1.200', '192.168.5.0/24')
 */
 $config['proxy_ips'] = '';
+
+/*
+|--------------------------------------------------------------------------
+| HMVC Modules Location
+|--------------------------------------------------------------------------
+|
+| Tell the HMVC router where to find module folders.
+| Default: application/modules/
+|
+*/
+// PERBAIKAN: Normalisasi path untuk Windows (ganti backslash ke forward slash)
+// CI dan HMVC Router butuh forward slash agar str_replace di locate() bisa matching
+$_modules_path = str_replace('\\', '/', realpath(APPPATH . 'modules')) . '/';
+$config['modules_locations'] = array($_modules_path);
+unset($_modules_path);
