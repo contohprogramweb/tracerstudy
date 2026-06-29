@@ -4,16 +4,19 @@
 __pycache__/
 *.o
 *.obj
-*.exe
-*.dll
+*.class
 *.so
-*.a
+*.dll
+*.exe
 *.out
 
 # Dependencies
-vendor/
 node_modules/
-composer.lock
+venv/
+.venv/
+.env
+.env.local
+.env.*
 
 # Logs and temp files
 *.log
@@ -21,32 +24,16 @@ composer.lock
 *.swp
 *.swo
 
-# Environment
-.env
-.env.local
-*.env.*
-
 # Editors
 .vscode/
 .idea/
 
-# System files
+# OS generated files
 .DS_Store
 Thumbs.db
 
-# Coverage and testing
-coverage/
-htmlcov/
-.coverage
-
-# Build and distribution
+# Build directories
 dist/
 build/
 target/
-.gradle/
-
-# Cache directories
-.cache/
-.mypy_cache/
-.pytest_cache/
 ```

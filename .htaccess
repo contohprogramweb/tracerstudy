@@ -1,10 +1,12 @@
 # Root .htaccess - Redirect semua request ke folder public/
-# Compatible: Apache 2.4 + XAMPP Windows
+# Compatible: Apache 2.4 + XAMPP Windows/Linux
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Sesuaikan jika app di subfolder, misal: RewriteBase /tracerstudy/
+    # Sesuaikan RewriteBase dengan path instalasi Anda
+    # Jika aplikasi di http://localhost/tracerstudy/ gunakan /tracerstudy/
+    # Jika aplikasi di http://localhost/ gunakan /
     RewriteBase /tracerstudy/
 
     # Jika request sudah ke public/, biarkan
@@ -12,4 +14,9 @@
 
     # Redirect ke public/
     RewriteRule ^(.*)$ public/$1 [L,QSA]
+</IfModule>
+
+# Fallback jika mod_rewrite tidak aktif
+<IfModule !mod_rewrite.c>
+    RedirectMatch permanent ^/(.*)$ /tracerstudy/public/$1
 </IfModule>

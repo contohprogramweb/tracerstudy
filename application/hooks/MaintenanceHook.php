@@ -24,6 +24,11 @@ class MaintenanceHook
      */
     public function check_maintenance()
     {
+        // Pastikan instance CI dan uri sudah terinisialisasi
+        if (!$this->CI || !isset($this->CI->uri)) {
+            return;
+        }
+        
         $maintenance_enabled = FALSE;
 
         // Option 1: Check via config item
