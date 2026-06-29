@@ -141,6 +141,7 @@ class Auth_lib {
         if (!$this->isLoggedIn()) {
             $this->CI->session->set_flashdata('error', 'Silakan login terlebih dahulu.');
             redirect('login');
+            exit;
         }
     }
 
@@ -159,8 +160,10 @@ class Auth_lib {
             
             if ($redirect_url) {
                 redirect($redirect_url);
+                exit;
             } else {
                 redirect($this->_getDefaultDashboard());
+                exit;
             }
         }
     }
