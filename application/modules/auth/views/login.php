@@ -131,6 +131,7 @@
             <?php echo validation_errors('<div class="alert alert-warning">', '</div>'); ?>
             
             <form action="<?= site_url('login') ?>" method="post">
+                <?= form_hidden($this->security->get_csrf_token_name(), $this->security->get_csrf_hash()); ?>
                 <div class="mb-3">
                     <label for="username" class="form-label">Username atau Email</label>
                     <div class="input-group">

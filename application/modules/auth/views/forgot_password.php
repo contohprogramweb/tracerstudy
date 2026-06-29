@@ -140,6 +140,7 @@
             <?php echo validation_errors('<div class="alert alert-warning">', '</div>'); ?>
             
             <form action="<?= site_url('forgot-password') ?>" method="post">
+                <?= form_hidden($this->security->get_csrf_token_name(), $this->security->get_csrf_hash()); ?>
                 <div class="mb-4">
                     <label for="email" class="form-label">Email</label>
                     <div class="input-group">

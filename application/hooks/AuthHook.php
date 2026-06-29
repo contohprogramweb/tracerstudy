@@ -102,6 +102,11 @@ class AuthHook
      */
     public function set_user_data()
     {
+        // Pastikan instance CI dan session sudah terinisialisasi
+        if (!$this->CI || !isset($this->CI->session)) {
+            return;
+        }
+
         if ($this->CI->session->has_userdata('user_id')) {
             $user_data = $this->CI->session->userdata('user_data');
 
