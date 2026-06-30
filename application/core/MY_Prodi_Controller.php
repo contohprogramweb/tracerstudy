@@ -6,7 +6,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * 
  * Base controller untuk modul prodi dengan akses terbatas berdasarkan role
  */
-class Prodi_Controller extends MY_Controller {
+class MY_Prodi_Controller extends MY_Controller {
     
     protected $prodi_id = null;
     

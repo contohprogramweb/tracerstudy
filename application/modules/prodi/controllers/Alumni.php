@@ -6,7 +6,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * 
  * Mengelola data alumni tingkat prodi (CRUD, export)
  */
-class Alumni extends Prodi_Controller {
+class Alumni extends MY_Prodi_Controller {
     
     public function __construct() {
         parent::__construct();
