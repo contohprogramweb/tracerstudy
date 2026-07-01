@@ -22,8 +22,8 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h5 class="mb-1 text-dark"><?= htmlspecialchars($prodi_info['nama_prodi']) ?></h5>
-                            <p class="text-muted mb-0 small">Kode Prodi: <?= htmlspecialchars($prodi_info['kode_prodi']) ?></p>
+                            <h5 class="mb-1 text-dark"><?= htmlspecialchars($prodi_info['nama_prodi'] ?? $prodi_info['nama'] ?? 'Nama Prodi Tidak Ditemukan') ?></h5>
+                            <p class="text-muted mb-0 small">Kode Prodi: <?= htmlspecialchars($prodi_info['kode_prodi'] ?? $prodi_info['kode'] ?? 'N/A') ?></p>
                         </div>
                     </div>
                 </div>
@@ -204,9 +204,9 @@
                                     <td>
                                         <span class="badge bg-secondary"><?= htmlspecialchars($activity['username'] ?? 'System') ?></span>
                                     </td>
-                                    <td><?= htmlspecialchars($activity['activity']) ?></td>
+                                    <td><?= htmlspecialchars($activity['activity'] ?? '-') ?></td>
                                     <td>
-                                        <span class="badge bg-primary"><?= htmlspecialchars($activity['module']) ?></span>
+                                        <span class="badge bg-primary"><?= htmlspecialchars($activity['module'] ?? '-') ?></span>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
