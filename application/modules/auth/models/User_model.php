@@ -44,7 +44,19 @@ class User_model extends MY_Model {
      */
     public function getUserById($id)
     {
-        return $this->get_by_id($id);
+        $this->db->where($this->primary_key, $id);
+        if ($this->soft_delete) {
+            $this->db->where($this->deleted_field, NULL);
+        }
+        $query = $this->db->get($this->table_name);
+        $user = $query->row();
+        
+        // Pastikan selalu mengembalikan object
+        if (is_array($user)) {
+            return (object) $user;
+        }
+        
+        return $user;
     }
 
     /**

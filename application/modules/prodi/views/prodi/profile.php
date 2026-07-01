@@ -1,4 +1,4 @@
-<?php $this->load->view('templates/header'); ?>
+<?php $this->load->view('prodi/templates/header'); ?>
 
 <div class="card">
     <div class="card-header">
@@ -11,7 +11,7 @@
         <?php if ($this->session->flashdata('error')): ?>
             <div class="alert alert-danger"><?= $this->session->flashdata('error') ?></div>
         <?php endif; ?>
-        
+
         <table class="table table-bordered">
             <tr>
                 <th width="200">Username</th>
@@ -34,11 +34,11 @@
                 <td><?= htmlspecialchars($user->last_login ?? '-') ?></td>
             </tr>
         </table>
-        
+
         <a href="<?= base_url('prodi/profile/change-password') ?>" class="btn btn-outline-primary">
             <i class="bi bi-key"></i> Ganti Password
         </a>
     </div>
 </div>
 
-<?php $this->load->view('templates/footer'); ?>
+<?php $this->load->view('prodi/templates/footer'); ?>

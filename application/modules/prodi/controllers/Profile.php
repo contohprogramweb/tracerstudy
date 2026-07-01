@@ -21,10 +21,18 @@ class Profile extends MY_Prodi_Controller {
     public function index()
     {
         $user_id = $this->session->userdata('user_id');
+        
+        if (empty($user_id)) {
+            show_error('Session tidak valid. Silakan login ulang.', 401);
+            return;
+        }
+        
         $user = $this->User_model->getUserById($user_id);
         
-        if (!$user) {
-            show_error('User tidak ditemukan.', 404);
+        if (!$user || empty($user->id)) {
+            log_message('error', 'User tidak ditemukan untuk user_id: ' . $user_id);
+            show_error('User tidak ditemukan di database.', 404);
+            return;
         }
         
         $data = array(
