@@ -5,9 +5,9 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h2 class="text-dark fw-bold mb-1">
-                        <i class="fas fa-users me-2"></i><?= esc($page_title) ?>
+                        <i class="fas fa-users me-2"></i><?= htmlspecialchars($page_title) ?>
                     </h2>
-                    <p class="text-muted mb-0"><?= esc($page_subtitle) ?></p>
+                    <p class="text-muted mb-0"><?= htmlspecialchars($page_subtitle) ?></p>
                 </div>
                 <div>
                     <a href="<?= site_url('prodi/alumni/add') ?>" class="btn btn-primary">
@@ -28,7 +28,7 @@
                         <select class="form-select form-select-sm" name="kohort_id" id="filterKohort">
                             <option value="">Semua Kohort</option>
                             <?php foreach ($kohorts as $kohort): ?>
-                            <option value="<?= $kohort['id'] ?>"><?= esc($kohort['nama']) ?></option>
+                            <option value="<?= $kohort['id'] ?>"><?= htmlspecialchars($kohort['nama']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -36,7 +36,7 @@
                         <label class="form-label small text-muted">Status Kerja</label>
                         <select class="form-select form-select-sm" name="status_kerja" id="filterStatus">
                             <?php foreach ($status_kerja_options as $value => $label): ?>
-                            <option value="<?= $value ?>"><?= esc($label) ?></option>
+                            <option value="<?= $value ?>"><?= htmlspecialchars($label) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>

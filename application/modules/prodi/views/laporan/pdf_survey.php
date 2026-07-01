@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>Laporan Hasil Survei</h1>
-    <p>Program Studi: <?= esc($prodi_info['nama_prodi'] ?? '-') ?></p>
+    <p>Program Studi: <?= htmlspecialchars($prodi_info['nama_prodi'] ?? '-') ?></p>
     <p>Tahun: <?= $tahun ?></p>
     <p>Dibuat: <?= $generated_at ?></p>
     <div class="footer"><p>&copy; <?= date('Y') ?> Universitas</p></div>

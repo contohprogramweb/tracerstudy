@@ -3,9 +3,9 @@
     <div class="row mb-4">
         <div class="col-12">
             <h2 class="text-dark fw-bold mb-1">
-                <i class="fas fa-chart-bar me-2"></i><?= esc($page_title) ?>
+                <i class="fas fa-chart-bar me-2"></i><?= htmlspecialchars($page_title) ?>
             </h2>
-            <p class="text-muted mb-0"><?= esc($page_subtitle) ?></p>
+            <p class="text-muted mb-0"><?= htmlspecialchars($page_subtitle) ?></p>
         </div>
     </div>
 
@@ -37,7 +37,7 @@
                     </div>
                     <div class="col-md-4">
                         <label class="form-label small text-muted">Program Studi</label>
-                        <input type="text" class="form-control form-control-sm" value="<?= esc($prodi_info['nama_prodi'] ?? '-') ?>" readonly>
+                        <input type="text" class="form-control form-control-sm" value="<?= htmlspecialchars($prodi_info['nama_prodi'] ?? '-') ?>" readonly>
                     </div>
                     <div class="col-md-2">
                         <button type="submit" class="btn btn-primary btn-sm w-100">
