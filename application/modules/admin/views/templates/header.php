@@ -173,12 +173,20 @@
         </div>
         <ul class="sidebar-menu">
             <li><a href="<?= base_url('admin/dashboard') ?>" class="<?= ($this->uri->segment(2) == 'dashboard') ? 'active' : '' ?>"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
-            <li><a href="<?= base_url('admin/audit') ?>" class="<?= ($this->uri->segment(2) == 'audit') ? 'active' : '' ?>"><i class="bi bi-shield-check"></i> Audit Trail</a></li>
-            <li><a href="<?= base_url('admin/users') ?>"><i class="bi bi-people"></i> Manajemen User</a></li>
-            <li><a href="<?= base_url('admin/alumni') ?>"><i class="bi bi-person-badge"></i> Data Alumni</a></li>
-            <li><a href="<?= base_url('admin/surveys') ?>"><i class="bi bi-card-checklist"></i> Survei</a></li>
-            <li><a href="<?= base_url('admin/reports') ?>"><i class="bi bi-file-earmark-bar-graph"></i> Laporan</a></li>
-            <li><a href="<?= base_url('admin/settings') ?>"><i class="bi bi-gear"></i> Pengaturan</a></li>
+            
+            <?php if ($this->session->userdata('role') === 'super_admin'): ?>
+                <!-- Menu khusus Super Admin -->
+                <li><a href="<?= base_url('admin/users') ?>"><i class="bi bi-people"></i> Manajemen User</a></li>
+                <li><a href="<?= base_url('admin/audit') ?>"><i class="bi bi-shield-check"></i> Audit Trail</a></li>
+                <li><a href="<?= base_url('admin/settings') ?>"><i class="bi bi-gear"></i> Pengaturan</a></li>
+            <?php endif; ?>
+            
+            <?php if ($this->session->userdata('role') === 'super_admin' || $this->session->userdata('role') === 'admin_pusat_karir'): ?>
+                <!-- Menu bersama Super Admin dan Admin Pusat Karir -->
+                <li><a href="<?= base_url('admin/alumni') ?>"><i class="bi bi-person-badge"></i> Data Alumni</a></li>
+                <li><a href="<?= base_url('admin/surveys') ?>"><i class="bi bi-card-checklist"></i> Survei</a></li>
+                <li><a href="<?= base_url('admin/reports') ?>"><i class="bi bi-file-earmark-bar-graph"></i> Laporan</a></li>
+            <?php endif; ?>
         </ul>
     </nav>
 

@@ -1,1 +1,26 @@
-Nothing should be ignored in this case, as the changes only involve PHP source files (.php) which are core application code and not build artifacts, dependencies, or temporary files.
+```
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+
+# Dependencies
+vendor/
+composer.lock
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+```

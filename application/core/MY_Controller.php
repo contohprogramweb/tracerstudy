@@ -13,6 +13,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @author      Tracer Study Team
  */
 
+// Load custom core controllers
+if (file_exists(APPPATH.'core/MY_Prodi_Controller.php')) {
+    require_once APPPATH.'core/MY_Prodi_Controller.php';
+}
+
 class MY_Controller extends CI_Controller
 {
     /**
