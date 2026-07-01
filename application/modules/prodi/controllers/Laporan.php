@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /**
  * Laporan Controller - Generate dan Export Laporan untuk Admin Prodi
  */
-class Laporan extends Prodi_Controller {
+class Laporan extends MY_Prodi_Controller {
     
     public function __construct() {
         parent::__construct();

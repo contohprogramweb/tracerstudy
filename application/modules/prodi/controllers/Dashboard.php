@@ -6,7 +6,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * 
  * Menampilkan overview data prodi dengan statistik dan informasi penting
  */
-class Dashboard extends Prodi_Controller {
+class Dashboard extends MY_Prodi_Controller {
     
     public function __construct() {
         parent::__construct();
