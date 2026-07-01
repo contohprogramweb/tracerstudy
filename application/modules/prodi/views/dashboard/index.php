@@ -3,9 +3,9 @@
     <div class="row mb-4">
         <div class="col-12">
             <h2 class="text-dark fw-bold">
-                <i class="fas fa-tachometer-alt me-2"></i><?= esc($page_title) ?>
+                <i class="fas fa-tachometer-alt me-2"></i><?= htmlspecialchars($page_title) ?>
             </h2>
-            <p class="text-muted"><?= esc($page_subtitle) ?></p>
+            <p class="text-muted"><?= htmlspecialchars($page_subtitle) ?></p>
         </div>
     </div>
 
@@ -22,8 +22,8 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h5 class="mb-1 text-dark"><?= esc($prodi_info['nama_prodi']) ?></h5>
-                            <p class="text-muted mb-0 small">Kode Prodi: <?= esc($prodi_info['kode_prodi']) ?></p>
+                            <h5 class="mb-1 text-dark"><?= htmlspecialchars($prodi_info['nama_prodi']) ?></h5>
+                            <p class="text-muted mb-0 small">Kode Prodi: <?= htmlspecialchars($prodi_info['kode_prodi']) ?></p>
                         </div>
                     </div>
                 </div>
@@ -202,11 +202,11 @@
                                         </small>
                                     </td>
                                     <td>
-                                        <span class="badge bg-secondary"><?= esc($activity['username'] ?? 'System') ?></span>
+                                        <span class="badge bg-secondary"><?= htmlspecialchars($activity['username'] ?? 'System') ?></span>
                                     </td>
-                                    <td><?= esc($activity['activity']) ?></td>
+                                    <td><?= htmlspecialchars($activity['activity']) ?></td>
                                     <td>
-                                        <span class="badge bg-primary"><?= esc($activity['module']) ?></span>
+                                        <span class="badge bg-primary"><?= htmlspecialchars($activity['module']) ?></span>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
