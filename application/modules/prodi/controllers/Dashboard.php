@@ -72,11 +72,17 @@ class Dashboard extends MY_Prodi_Controller {
             $data['total_surveys'] = $this->db->count_all_results();
             
             // Survei aktif
+            $this->db->select('s.*');
+            $this->db->from('surveys s');
+            $this->db->join('survey_targets st', 's.id = st.survey_id');
             $this->db->where('st.prodi_id', $prodi_id);
             $this->db->where('s.status', 'active');
             $data['active_surveys'] = $this->db->count_all_results();
             
             // Survei draft
+            $this->db->select('s.*');
+            $this->db->from('surveys s');
+            $this->db->join('survey_targets st', 's.id = st.survey_id');
             $this->db->where('st.prodi_id', $prodi_id);
             $this->db->where('s.status', 'draft');
             $data['draft_surveys'] = $this->db->count_all_results();
@@ -105,13 +111,10 @@ class Dashboard extends MY_Prodi_Controller {
             $data['response_rate'] = 0;
         }
         
-        // Activity logs terbaru untuk prodi ini (5 terakhir)
+        // Activity logs terbaru (5 terakhir) - audit log bersifat global, tidak difilter per prodi
         $this->db->select('al.*, u.username');
         $this->db->from('activity_logs al');
         $this->db->join('users u', 'al.user_id = u.id', 'left');
-        if ($prodi_id) {
-            $this->db->where('al.prodi_id', $prodi_id);
-        }
         $this->db->order_by('al.created_at', 'DESC');
         $this->db->limit(5);
         $data['recent_activities'] = $this->db->get()->result_array();
