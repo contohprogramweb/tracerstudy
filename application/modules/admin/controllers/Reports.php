@@ -23,7 +23,7 @@ class Reports extends Admin_Controller {
         $data['page_subtitle'] = 'Laporan dan statistik tracer study';
         
         // Statistik ringkas untuk laporan
-        $data['total_alumni'] = $this->db->count_all('alumni_profiles');
+        $data['total_alumni'] = $this->db->count_all('alumni');
         $data['total_surveys'] = $this->db->count_all('surveys');
         $data['total_responses'] = $this->db->count_all('survey_responses');
         
@@ -31,7 +31,7 @@ class Reports extends Admin_Controller {
         $this->db->select('graduation_year, COUNT(*) as total');
         $this->db->group_by('graduation_year');
         $this->db->order_by('graduation_year', 'DESC');
-        $data['alumni_by_year'] = $this->db->get('alumni_profiles')->result_array();
+        $data['alumni_by_year'] = $this->db->get('alumni')->result_array();
         
         // Response rate per survei
         $this->db->select('s.title, s.status, COUNT(sr.id) as response_count');

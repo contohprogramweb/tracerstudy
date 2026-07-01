@@ -53,14 +53,14 @@ class Laporan extends MY_Prodi_Controller {
             if ($type === 'tracer' || $type === 'status') {
                 $this->db->where('tahun_lulus', $tahun);
             }
-            $data['total_alumni'] = $this->db->count_all_results('alumni_profiles');
+            $data['total_alumni'] = $this->db->count_all_results('alumni');
             
             // Get status breakdown
             $this->db->where('prodi_id', $this->prodi_id);
             if ($type === 'tracer' || $type === 'status') {
                 $this->db->where('tahun_lulus', $tahun);
             }
-            $status_data = $this->db->group_by('status_kerja')->get('alumni_profiles')->result_array();
+            $status_data = $this->db->group_by('status_kerja')->get('alumni')->result_array();
             $data['status_breakdown'] = [];
             foreach ($status_data as $row) {
                 $data['status_breakdown'][$row['status_kerja']] = $this->db->affected_rows();
@@ -95,7 +95,7 @@ class Laporan extends MY_Prodi_Controller {
         $tahun = $this->input->get('tahun') ?? null;
         
         $this->db->select('ap.*, p.nama_prodi, p.kode_prodi');
-        $this->db->from('alumni_profiles ap');
+        $this->db->from('alumni ap');
         $this->db->join('prodi p', 'ap.prodi_id = p.id', 'left');
         $this->db->where('ap.prodi_id', $this->prodi_id);
         

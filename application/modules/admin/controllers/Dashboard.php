@@ -27,7 +27,7 @@ class Dashboard extends Admin_Controller {
         
         // Statistik umum
         $data['total_users'] = $this->db->count_all('users');
-        $data['total_alumni'] = $this->db->count_all('alumni_profiles');
+        $data['total_alumni'] = $this->db->count_all('alumni');
         $data['total_surveys'] = $this->db->count_all('surveys');
         $data['total_responses'] = $this->db->count_all('survey_responses');
         

@@ -36,24 +36,24 @@ class Dashboard extends MY_Prodi_Controller {
         // Statistik alumni per prodi
         if ($prodi_id) {
             $this->db->where('prodi_id', $prodi_id);
-            $data['total_alumni'] = $this->db->count_all_results('alumni_profiles');
+            $data['total_alumni'] = $this->db->count_all_results('alumni');
             
             // Status kerja
             $this->db->where('prodi_id', $prodi_id);
             $this->db->where('status_kerja', 'bekerja');
-            $data['alumni_bekerja'] = $this->db->count_all_results('alumni_profiles');
+            $data['alumni_bekerja'] = $this->db->count_all_results('alumni');
             
             $this->db->where('prodi_id', $prodi_id);
             $this->db->where('status_kerja', 'belum_bekerja');
-            $data['alumni_belum_bekerja'] = $this->db->count_all_results('alumni_profiles');
+            $data['alumni_belum_bekerja'] = $this->db->count_all_results('alumni');
             
             $this->db->where('prodi_id', $prodi_id);
             $this->db->where('status_kerja', 'wirausaha');
-            $data['alumni_wirausaha'] = $this->db->count_all_results('alumni_profiles');
+            $data['alumni_wirausaha'] = $this->db->count_all_results('alumni');
             
             $this->db->where('prodi_id', $prodi_id);
             $this->db->where('status_kerja', 'melanjutkan_studi');
-            $data['alumni_melanjutkan_studi'] = $this->db->count_all_results('alumni_profiles');
+            $data['alumni_melanjutkan_studi'] = $this->db->count_all_results('alumni');
         } else {
             $data['total_alumni'] = 0;
             $data['alumni_bekerja'] = 0;
@@ -90,7 +90,7 @@ class Dashboard extends MY_Prodi_Controller {
         if ($prodi_id) {
             $this->db->select('COUNT(DISTINCT sr.id) as total');
             $this->db->from('survey_responses sr');
-            $this->db->join('alumni_profiles ap', 'sr.alumni_id = ap.id');
+            $this->db->join('alumni ap', 'sr.alumni_id = ap.id');
             $this->db->where('ap.prodi_id', $prodi_id);
             $query = $this->db->get()->row();
             $data['total_responses'] = $query ? $query->total : 0;

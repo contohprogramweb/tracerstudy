@@ -114,7 +114,7 @@ class Alumni extends MY_Prodi_Controller {
         $data['page_subtitle'] = 'Tambah alumni baru';
         
         if ($this->input->post()) {
-            $this->form_validation->set_rules('nim', 'NIM', 'required|is_unique[alumni_profiles.nim]');
+            $this->form_validation->set_rules('nim', 'NIM', 'required|is_unique[alumni.nim]');
             $this->form_validation->set_rules('nama', 'Nama', 'required');
             $this->form_validation->set_rules('prodi_id', 'Prodi', 'required');
             $this->form_validation->set_rules('tahun_lulus', 'Tahun Lulus', 'required|integer|min_length[4]|max_length[4]');

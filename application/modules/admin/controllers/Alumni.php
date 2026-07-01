@@ -17,7 +17,7 @@ class Alumni extends Admin_Controller {
         $data['page_subtitle'] = 'Kelola data alumni';
         
         $this->db->select('ap.*, u.username, u.email');
-        $this->db->from('alumni_profiles ap');
+        $this->db->from('alumni ap');
         $this->db->join('users u', 'ap.user_id = u.id', 'left');
         $this->db->order_by('ap.created_at', 'DESC');
         $data['alumni'] = $this->db->get()->result_array();
