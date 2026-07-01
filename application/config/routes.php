@@ -34,6 +34,21 @@ $route['auth/change-password']          = 'auth/auth/changePassword';
 
 /*
 |--------------------------------------------------------------------------
+| Prodi Module Routes
+|--------------------------------------------------------------------------
+*/
+$route['prodi']                         = 'prodi/dashboard/index';
+$route['prodi/dashboard']               = 'prodi/dashboard/index';
+$route['prodi/alumni']                  = 'prodi/alumni/index';
+$route['prodi/alumni/(:any)']           = 'prodi/alumni/$1';
+$route['prodi/survey']                  = 'prodi/survey/index';
+$route['prodi/laporan']                 = 'prodi/laporan/index';
+$route['prodi/laporan/(:any)']          = 'prodi/laporan/$1';
+$route['prodi/profile']                 = 'prodi/profile/index';
+$route['prodi/profile/change-password'] = 'prodi/profile/changePassword';
+
+/*
+|--------------------------------------------------------------------------
 | Admin Module Routes
 |--------------------------------------------------------------------------
 */

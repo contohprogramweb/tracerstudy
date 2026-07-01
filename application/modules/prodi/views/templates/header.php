@@ -176,7 +176,7 @@
             <li><a href="<?= base_url('prodi/alumni') ?>" class="<?= ($this->uri->segment(2) == 'alumni') ? 'active' : '' ?>"><i class="bi bi-person-badge"></i> Data Alumni</a></li>
             <li><a href="<?= base_url('prodi/survey') ?>" class="<?= ($this->uri->segment(2) == 'survey') ? 'active' : '' ?>"><i class="bi bi-card-checklist"></i> Survei</a></li>
             <li><a href="<?= base_url('prodi/laporan') ?>" class="<?= ($this->uri->segment(2) == 'laporan') ? 'active' : '' ?>"><i class="bi bi-file-earmark-bar-graph"></i> Laporan</a></li>
-            <li><a href="<?= base_url('auth/profile') ?>" class="<?= ($this->uri->segment(2) == 'profile') ? 'active' : '' ?>"><i class="bi bi-person-gear"></i> Profil</a></li>
+            <li><a href="<?= base_url('prodi/profile') ?>" class="<?= ($this->uri->segment(2) == 'profile') ? 'active' : '' ?>"><i class="bi bi-person-gear"></i> Profil</a></li>
         </ul>
     </nav>
 
