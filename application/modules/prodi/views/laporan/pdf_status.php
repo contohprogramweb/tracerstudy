@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Status Alumni - <?= esc($prodi_info['nama_prodi'] ?? 'Program Studi') ?></title>
+    <title>Laporan Status Alumni - <?= htmlspecialchars($prodi_info['nama_prodi'] ?? 'Program Studi') ?></title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -85,15 +85,15 @@
 <body>
     <div class="header">
         <h1>Laporan Status Alumni</h1>
-        <h2><?= esc($prodi_info['nama_prodi'] ?? 'Program Studi') ?></h2>
+        <h2><?= htmlspecialchars($prodi_info['nama_prodi'] ?? 'Program Studi') ?></h2>
         <p>Tahun Lulus: <?= $tahun ?></p>
     </div>
 
     <div class="info-section">
         <strong>Informasi Laporan:</strong><br>
         Tanggal Generate: <?= $generated_at ?><br>
-        Program Studi: <?= esc($prodi_info['nama_prodi'] ?? '-') ?><br>
-        Kode Prodi: <?= esc($prodi_info['kode_prodi'] ?? '-') ?>
+        Program Studi: <?= htmlspecialchars($prodi_info['nama_prodi'] ?? '-') ?><br>
+        Kode Prodi: <?= htmlspecialchars($prodi_info['kode_prodi'] ?? '-') ?>
     </div>
 
     <div class="stats-grid">

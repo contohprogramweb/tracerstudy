@@ -1,32 +1,16 @@
+```
 # Compiled and build artifacts
 *.pyc
 __pycache__/
 *.o
 *.obj
-*.class
-*.exe
-*.dll
-*.so
-*.a
-*.out
-
-# Dependencies
-.venv/
-venv/
-node_modules/
-pip-wheel-metadata/
-.wheelhouse/
-.tox/
-.coverage
-htmlcov/
-
-# Logs and temp files
 *.log
 *.tmp
 *.swp
-*.swo
-*.bak
-*.cache
+
+# Dependencies
+vendor/
+node_modules/
 
 # Environment
 .env
@@ -36,22 +20,29 @@ htmlcov/
 # Editors
 .vscode/
 .idea/
-*.swp
-*.swo
+
+# OS generated files
 .DS_Store
 Thumbs.db
 
-# Build directories
-dist/
-build/
-target/
-.gradle/
-.mypy_cache/
-.pytest_cache/
-coverage/
-htmlcov/
+# CodeIgniter specific
+application/cache/
+application/logs/
+application/temp/
+system/
+!system/index.html
 
-# Compressed files
+# Database
+*.sql
+*.db
+*.sqlite
+
+# Backup files
+*~
+*.bak
+*.backup
+
+# Compression archives
 *.zip
 *.gz
 *.tar
@@ -74,3 +65,4 @@ htmlcov/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
+```

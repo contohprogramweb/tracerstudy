@@ -3,9 +3,9 @@
     <div class="row mb-4">
         <div class="col-12">
             <h2 class="text-dark fw-bold mb-1">
-                <i class="fas fa-<?= isset($alumni) ? 'edit' : 'plus' ?> me-2"></i><?= esc($page_title) ?>
+                <i class="fas fa-<?= isset($alumni) ? 'edit' : 'plus' ?> me-2"></i><?= htmlspecialchars($page_title) ?>
             </h2>
-            <p class="text-muted mb-0"><?= esc($page_subtitle) ?></p>
+            <p class="text-muted mb-0"><?= htmlspecialchars($page_subtitle) ?></p>
         </div>
     </div>
 
@@ -65,7 +65,7 @@
                                 <?php foreach ($prodis as $prodi): ?>
                                 <option value="<?= $prodi['id'] ?>" 
                                         <?= set_select('prodi_id', $prodi['id'], (isset($alumni) && $alumni->prodi_id == $prodi['id'])) ?>>
-                                    <?= esc($prodi['nama']) ?> (<?= esc($prodi['kode']) ?>)
+                                    <?= htmlspecialchars($prodi['nama']) ?> (<?= htmlspecialchars($prodi['kode']) ?>)
                                 </option>
                                 <?php endforeach; ?>
                             </select>

@@ -3,9 +3,9 @@
     <div class="row mb-4">
         <div class="col-12">
             <h2 class="text-dark fw-bold mb-1">
-                <i class="fas fa-cog me-2"></i><?= esc($page_title) ?>
+                <i class="fas fa-cog me-2"></i><?= htmlspecialchars($page_title) ?>
             </h2>
-            <p class="text-muted mb-0"><?= esc($page_subtitle) ?></p>
+            <p class="text-muted mb-0"><?= htmlspecialchars($page_subtitle) ?></p>
         </div>
     </div>
 
@@ -36,7 +36,7 @@
                             <select class="form-select" name="kohort_id" id="kohortId">
                                 <option value="">Semua Kohort</option>
                                 <?php foreach ($kohorts as $kohort): ?>
-                                <option value="<?= $kohort['id'] ?>"><?= esc($kohort['nama']) ?></option>
+                                <option value="<?= $kohort['id'] ?>"><?= htmlspecialchars($kohort['nama']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>

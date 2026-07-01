@@ -3,9 +3,9 @@
     <div class="row mb-4">
         <div class="col-12">
             <h2 class="text-dark fw-bold mb-1">
-                <i class="fas fa-clipboard-list me-2"></i><?= esc($page_title) ?>
+                <i class="fas fa-clipboard-list me-2"></i><?= htmlspecialchars($page_title) ?>
             </h2>
-            <p class="text-muted mb-0"><?= esc($page_subtitle) ?></p>
+            <p class="text-muted mb-0"><?= htmlspecialchars($page_subtitle) ?></p>
         </div>
     </div>
 
@@ -28,11 +28,11 @@
                     </div>
 
                     <!-- Title -->
-                    <h5 class="card-title text-dark mb-2"><?= esc($survey['title']) ?></h5>
+                    <h5 class="card-title text-dark mb-2"><?= htmlspecialchars($survey['title']) ?></h5>
                     
                     <!-- Description -->
                     <p class="card-text text-muted small mb-3">
-                        <?= esc(substr($survey['description'] ?? '', 0, 100)) ?><?= strlen($survey['description'] ?? '') > 100 ? '...' : '' ?>
+                        <?= htmlspecialchars(substr($survey['description'] ?? '', 0, 100)) ?><?= strlen($survey['description'] ?? '') > 100 ? '...' : '' ?>
                     </p>
 
                     <!-- Info -->
