@@ -20,3 +20,9 @@
 <IfModule !mod_rewrite.c>
     RedirectMatch permanent ^/(.*)$ /tracerstudy/public/$1
 </IfModule>
+
+# Proteksi tambahan - blokir akses langsung ke folder sensitif
+<IfModule mod_rewrite.c>
+    # Blokir akses langsung ke application, system, dan file sensitif
+    RewriteRule ^(application|system|\.git|\.env|composer\.) - [F,L]
+</IfModule>
