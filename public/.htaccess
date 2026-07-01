@@ -10,10 +10,10 @@
     RewriteEngine On
 
     # PENTING untuk XAMPP: sesuaikan RewriteBase dengan path instalasi.
-    # Jika aplikasi di: http://localhost/tracerstudy/  -> RewriteBase /tracerstudy/public/
+    # Jika aplikasi di: http://localhost/tracerstudy/  -> RewriteBase /tracerstudy/
     # Jika aplikasi di: http://localhost/              -> RewriteBase /
     # Jika pakai VirtualHost (domain sendiri)         -> RewriteBase /
-    RewriteBase /tracerstudy/public/
+    RewriteBase /tracerstudy/
 
     # Jangan rewrite request ke file/folder yang sudah ada (assets, dll)
     RewriteCond %{REQUEST_FILENAME} !-f
