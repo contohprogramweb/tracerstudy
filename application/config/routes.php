@@ -6,18 +6,27 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | Default Route
 |--------------------------------------------------------------------------
 | default_controller: module/controller (HMVC format)
-| CI akan panggil index() pada Auth controller saat URI kosong
+| CI akan panggil index() pada Home controller di module public saat URI kosong untuk landing page
 */
-$route['default_controller'] = 'auth';
+$route['default_controller'] = 'public/home';
 $route['404_override']        = '';
 $route['translate_uri_dashes'] = FALSE;
+
+/*
+|--------------------------------------------------------------------------
+| Home/Landing Page Routes (Public Module)
+|--------------------------------------------------------------------------
+*/
+$route['']              = 'public/home/index';
+$route['home']          = 'public/home/index';
+$route['about']         = 'public/home/about';
+$route['contact']       = 'public/home/contact';
 
 /*
 |--------------------------------------------------------------------------
 | Auth Module Routes
 |--------------------------------------------------------------------------
 */
-$route['']                              = 'auth/auth/login';
 $route['login']                         = 'auth/auth/login';
 $route['logout']                        = 'auth/auth/logout';
 
